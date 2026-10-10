@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Prototyp</title>
+
+<script src="https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/p5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/addons/p5.sound.min.js"></script>
+</head>
+
+<body>
+  <h1>Prototyp</h1>
+
+  <script>
+   let mikrofon;
+let lautstaerke;
+let startKnopf;
+
+function setup() {
+  createCanvas(600, 400);
+
+  startKnopf = createButton("Mikrofon starten");
+  startKnopf.mousePressed(starteMikrofon);
+}
+
+function starteMikrofon() {
+  userStartAudio();
+
+  mikrofon = new p5.AudioIn();
+  mikrofon.start();
+
+  startKnopf.html("Mikrofon gestartet");
+}
+
+function draw() {
+  background(20);
+
+  lautstaerke = 0;
+
+  if (mikrofon) {
+    lautstaerke = mikrofon.getLevel();
+  }
+
+  let groesse = 100 + lautstaerke * 1000;
+
+  fill(0, 150, 255);
+  circle(300, 200, groesse);
+}
+  </script>
+</body>
+
+</html>
