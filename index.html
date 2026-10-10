@@ -14,7 +14,7 @@
 
   <script>
    let mikrofon;
-let gestartet = false;
+let lautstaerke;
 let startKnopf;
 
 function setup() {
@@ -24,34 +24,27 @@ function setup() {
   startKnopf.mousePressed(starteMikrofon);
 }
 
-async function starteMikrofon() {
-  try {
-    await userStartAudio();
+function starteMikrofon() {
+  userStartAudio();
 
-    mikrofon = new p5.AudioIn();
-    await mikrofon.start();
+  mikrofon = new p5.AudioIn();
+  mikrofon.start();
 
-    gestartet = true;
-    startKnopf.html("Mikrofon läuft");
-    startKnopf.attribute("disabled", "");
-  } catch (fehler) {
-    console.error(fehler);
-    startKnopf.html("Erneut versuchen");
-  }
+  startKnopf.html("Mikrofon gestartet");
 }
 
 function draw() {
   background(20);
 
-  let lautstaerke = 0;
+  lautstaerke = 0;
 
-  if (gestartet) {
+  if (mikrofon) {
     lautstaerke = mikrofon.getLevel();
   }
 
-  let groesse = 100 + lautstaerke * 1500;
+  let groesse = 100 + lautstaerke * 1000;
 
-  fill(0, 150, 255);
+  fill(150, 0, 255);
   circle(300, 200, groesse);
 }
   </script>
