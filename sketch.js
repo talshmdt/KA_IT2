@@ -2,7 +2,8 @@
 let mikrofon;
 let lautstaerke;
 let startKnopf;
-let wolke1;
+let wolken = [];
+let regler;
 
 class Wolke {
   constructor(x, y) {
@@ -31,7 +32,11 @@ class Wolke {
 function setup() {
   createCanvas(800, 500);
 
-  wolke1 = new Wolke(100, 100);
+  for (let i = 0; i < 10; i++) {
+  wolken.push(new Wolke(i * 100, random(50, 200)));
+}
+
+regler = createSlider(0, 10, 3, 1);
 
   startKnopf = createButton("Mikrofon starten");
   startKnopf.mousePressed(starteMikrofon);
@@ -55,6 +60,8 @@ function draw() {
     lautstaerke = mikrofon.getLevel();
   }
 
-  wolke1.bewegen();
-  wolke1.anzeigen();
+for (let i = 0; i < regler.value(); i++) {
+  wolken[i].bewegen();
+  wolken[i].anzeigen();
+}
 }
