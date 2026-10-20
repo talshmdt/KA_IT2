@@ -1,4 +1,8 @@
+let wolkenBild;
 
+function preload() {
+  wolkenBild = loadImage("Element 1.svg")
+}
 let mikrofon;
 let lautstaerke;
 let startKnopf;
@@ -9,37 +13,35 @@ class Wolke {
   constructor(x, y) {
     this.x = x;
     this.y = y;
+    this.geschwindigkeit = random(0.5, 2);
   }
 
   bewegen() {
-    this.x = this.x + 1;
+    this.x = this.x + this.geschwindigkeit;
 
-    if (this.x > 850) {
-      this.x = -150;
+    if (this.x > 800) {
+      this.x = -100;
+      this.y = random(0, 100);
+      this.geschwindigkeit = random(0.5, 2);
     }
   }
 
   anzeigen() {
-  fill(255);
-  noStroke();
-
-  ellipse(this.x, this.y, 60, 35);
-  ellipse(this.x + 30, this.y, 60, 35);
-  ellipse(this.x + 15, this.y - 12, 60, 35);
+    image(wolkenBild, this.x, this.y, 100, 60);
+  }
 }
-}
-
 function setup() {
   createCanvas(800, 500);
 
-  for (let i = 0; i < 50; i++) {
-  let x = (i % 10) * 100;
-  let y = 35 + Math.floor(i / 10) * 25;
+ 
+for (let i = 0; i < 100; i++) {
+  let x = random(-100, 800);
+  let y = random(0, 100);
 
   wolken.push(new Wolke(x, y));
 }
 
-regler = createSlider(0, 50, 10, 1);
+regler = createSlider(0, 100, 30, 1);
 
   startKnopf = createButton("Mikrofon starten");
   startKnopf.mousePressed(starteMikrofon);
