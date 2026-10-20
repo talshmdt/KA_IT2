@@ -1,7 +1,10 @@
+
 let wolkenBild;
+let sonnenBild;
 
 function preload() {
-  wolkenBild = loadImage("Element 1.svg")
+  wolkenBild = loadImage("wolke.svg");
+  sonnenBild = loadImage("sonne.svg");
 }
 let mikrofon;
 let lautstaerke;
@@ -64,7 +67,7 @@ function draw() {
   if (mikrofon && mikrofon.enabled) {
     lautstaerke = mikrofon.getLevel();
   }
-
+image(sonnenBild, 50, 30, 120, 120);
 for (let i = 0; i < regler.value(); i++) {
   wolken[i].bewegen();
   wolken[i].anzeigen();
