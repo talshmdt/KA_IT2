@@ -1,36 +1,9 @@
+
 let mikrofon;
 let lautstaerke;
 let startKnopf;
+let wolke1;
 
-function setup() {
-  createCanvas(600, 400);
-
-  startKnopf = createButton("Mikrofon starten");
-  startKnopf.mousePressed(starteMikrofon);
-}
-
-function starteMikrofon() {
-  userStartAudio();
-
-  mikrofon = new p5.AudioIn();
-  mikrofon.start();
-
-  startKnopf.html("Mikrofon gestartet");
-}
-
-function draw() {
-  background(20);
-
-  lautstaerke = 0;
-
-  if (mikrofon) {
-    lautstaerke = mikrofon.getLevel();}
-
-  let groesse = 100 + lautstaerke * 1000;
-
-  fill(2, 20, 200);
-  circle(300, 200, groesse);
-}// JavaScript Document
 class Wolke {
   constructor(x, y) {
     this.x = x;
@@ -55,17 +28,33 @@ class Wolke {
   }
 }
 
-let wolke1;
-
 function setup() {
   createCanvas(800, 500);
+
   wolke1 = new Wolke(100, 100);
+
+  startKnopf = createButton("Mikrofon starten");
+  startKnopf.mousePressed(starteMikrofon);
+}
+
+async function starteMikrofon() {
+  await userStartAudio();
+
+  mikrofon = new p5.AudioIn();
+  mikrofon.start();
+
+  startKnopf.html("Mikrofon gestartet");
 }
 
 function draw() {
   background(135, 206, 235);
 
+  lautstaerke = 0;
+
+  if (mikrofon && mikrofon.enabled) {
+    lautstaerke = mikrofon.getLevel();
+  }
+
   wolke1.bewegen();
   wolke1.anzeigen();
 }
-	}
