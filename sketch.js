@@ -20,23 +20,26 @@ class Wolke {
   }
 
   anzeigen() {
-    fill(255);
-    noStroke();
+  fill(255);
+  noStroke();
 
-    ellipse(this.x, this.y, 100, 60);
-    ellipse(this.x + 50, this.y, 100, 60);
-    ellipse(this.x + 25, this.y - 20, 100, 60);
-  }
+  ellipse(this.x, this.y, 60, 35);
+  ellipse(this.x + 30, this.y, 60, 35);
+  ellipse(this.x + 15, this.y - 12, 60, 35);
+}
 }
 
 function setup() {
   createCanvas(800, 500);
 
-  for (let i = 0; i < 10; i++) {
-  wolken.push(new Wolke(i * 100, random(50, 200)));
+  for (let i = 0; i < 50; i++) {
+  let x = (i % 10) * 100;
+  let y = 35 + Math.floor(i / 10) * 25;
+
+  wolken.push(new Wolke(x, y));
 }
 
-regler = createSlider(0, 10, 3, 1);
+regler = createSlider(0, 50, 10, 1);
 
   startKnopf = createButton("Mikrofon starten");
   startKnopf.mousePressed(starteMikrofon);
