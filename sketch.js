@@ -2,17 +2,21 @@
 let wolkenBild;
 let sonnenBild;
 let bergeBild;
-let umgebungBild;
+let huegelBild;
 let wasserBild;
-let baeumeBild;
+let baeumeHintenBild;
+let wiesenBild;
+let vordergrundBild;
 
 function preload() {
   wolkenBild = loadImage("wolke.svg");
   sonnenBild = loadImage("sonne.svg");
-  bergeBild = loadImage("berge.svg");
-  umgebungBild = loadImage("umgebung.svg");
-  wasserBild = loadImage("wasser.svg");
-  baeumeBild = loadImage("baeume.svg");
+  bergeBild = loadImage("1berge.svg");
+  huegelBild = loadImage("1huegel.svg");
+  wasserBild = loadImage("1wasser.svg");
+  baeumeHintenBild = loadImage("1baeumehinten.svg");
+  wiesenBild = loadImage("1wiesen.svg");
+  vordergrundBild = loadImage("1vordergrund.svg")
 }
 let mikrofon;
 let lautstaerke;
@@ -30,7 +34,7 @@ class Wolke {
   bewegen() {
     this.x = this.x + this.geschwindigkeit;
 
-    if (this.x > 800) {
+    if (this.x > width) {
       this.x = -100;
       this.y = random(0, 100);
       this.geschwindigkeit = random(0.5, 2);
@@ -42,7 +46,7 @@ class Wolke {
   }
 }
 function setup() {
-  createCanvas(800, 500);
+  createCanvas(750, 500);
 
  
 for (let i = 0; i < 100; i++) {
@@ -76,10 +80,12 @@ function draw() {
     lautstaerke = mikrofon.getLevel();
   }
 
-image(bergeBild, 0,0, 800, 500);
-image(wasserBild, 0, 0, 800, 500);
-image(umgebungBild, 0, 0, 800, 500);
-image(baeumeBild, 0, 0, 800, 500);
+image(bergeBild, 0, 0, 750, 500);
+image(huegelBild, 0, 0, 750, 500);
+image(wasserBild, 0, 0, 750, 500);
+image(baeumeHintenBild, 0, 0, 750, 500);
+image(wiesenBild, 0, 0, 750, 500);
+image(vordergrundBild, 0, 0, 750, 500);
 image(sonnenBild, 50, 30, 120, 120);
 	
 for (let i = 0; i < regler.value(); i++) {

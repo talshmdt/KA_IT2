@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="Ebene_2" data-name="Ebene 2" viewBox="0 0 750 500" width="750" height="500">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+
+      .cls-2 {
+        fill: #547c35;
+      }
+
+      .cls-3 {
+        fill: #85cbff;
+      }
+
+      .cls-4 {
+        fill: #aec2cf;
+      }
+
+      .cls-5 {
+        fill: #4b7036;
+      }
+
+      .cls-6 {
+        fill: #a6eeff;
+        mix-blend-mode: screen;
+      }
+
+      .cls-6, .cls-7, .cls-8 {
+        isolation: isolate;
+      }
+
+      .cls-6, .cls-8 {
+        opacity: .3;
+      }
+
+      .cls-9 {
+        fill: #6d9127;
+      }
+
+      .cls-10 {
+        fill: #fff;
+      }
+
+      .cls-11 {
+        fill: #64871f;
+      }
+
+      .cls-12 {
+        fill: #6f9643;
+      }
+
+      .cls-13 {
+        fill: #57751b;
+      }
+
+      .cls-14 {
+        fill: #41612f;
+      }
+
+      .cls-15 {
+        fill: #57b7f2;
+      }
+
+      .cls-16 {
+        fill: #c3d4de;
+      }
+
+      .cls-8 {
+        fill: #4f6633;
+        mix-blend-mode: multiply;
+      }
+
+      .cls-17 {
+        fill: #634336;
+      }
+
+      .cls-18 {
+        fill: #6b7c80;
+      }
+
+      .cls-19 {
+        fill: #536063;
+      }
+
+      .cls-20 {
+        fill: #8ab041;
+      }
+
+      .cls-21 {
+        clip-path: url(#clippath);
+      }
+    </style>
+    <clipPath id="clippath">
+      <rect class="cls-1" width="750" height="500"/>
+    </clipPath>
+  </defs>
+  <g id="Ebene_1-2" data-name="Ebene 1">
+    <g class="cls-7">
+      <g id="OBJECTS">
+        <g class="cls-21">
+          <g>
+            <g>
+              <path class="cls-4" d="M121.94,274.51l374.11-1.05v-35.38l-84.58-40.89,23.57,23.57-33.2-21.17s-66.88-39.46-68.8-39.93c-1.93-.48,9.14,17.32,9.14,17.32l-117.63-43.06-57.73,43.31,30.07-10.83-54.85,47.15,62.55-22.13-77.94,48.12-4.71,34.99v-.02Z"/>
+              <polygon class="cls-10" points="-53.81 274.51 203.27 133.91 193.89 148.35 225.41 133.91 167.67 177.22 196.74 166.75 142.89 213.54 205.44 191.41 127.5 239.52 121.94 274.51 -53.81 274.51"/>
+              <polyline class="cls-16" points="333.06 159.65 342.19 176.97 298.3 160.91"/>
+              <polygon class="cls-16" points="400.29 198.66 411.48 197.18 435.05 220.75 400.29 198.66"/>
+              <polygon class="cls-16" points="224.56 133.91 202.43 133.91 193.04 148.35 224.56 133.91"/>
+            </g>
+            <g>
+              <path class="cls-4" d="M477.78,274.5l295.24-43.47v-27.1l-64.78-31.32,18.05,18.05-25.43-16.21s-51.22-30.22-52.69-30.59c-1.47-.37,7,13.26,7,13.26l-90.1-32.98-44.22,33.17,23.03-8.29-42.01,36.11,47.9-16.95-59.7,36.85-12.31,69.46h.02Z"/>
+              <polygon class="cls-10" points="278.89 271.75 548.78 124.15 541.59 135.21 565.73 124.15 521.51 157.32 543.77 149.31 502.53 185.14 550.43 168.19 490.74 205.04 479.92 269.44 278.89 271.75"/>
+              <polyline class="cls-16" points="648.18 143.87 655.18 157.13 621.56 144.83"/>
+              <polygon class="cls-16" points="699.67 173.75 708.24 172.61 726.3 190.67 699.67 173.75"/>
+              <polygon class="cls-16" points="565.08 124.15 548.13 124.15 540.94 135.21 565.08 124.15"/>
+            </g>
+            </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
