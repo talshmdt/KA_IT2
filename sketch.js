@@ -1,18 +1,9 @@
 
-let wolkenBild;
-let sonnenBild;
-let bergeBild;
-let huegelBild;
-let wasserBild;
-let baeumeHintenBild;
-let wiesenBild;
-let vordergrundBild;
+let wolkenBild, sonnenBild, bergeBild, huegelBild;
+let wasserBild, baeumeHintenBild, wiesenBild, vordergrundBild;
 
-let mikrofon;
-let startKnopf;
+let mikrofon, fft, startKnopf, regler;
 let wolken = [];
-let regler;
-
 let wolkenHelligkeit = 255;
 
 function preload() {
@@ -26,39 +17,18 @@ function preload() {
   vordergrundBild = loadImage("1vordergrund.svg");
 }
 
-class Wolke {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.geschwindigkeit = random(0.5, 2);
-  }
-
-  bewegen() {
-    this.x = this.x + this.geschwindigkeit;
-
-    if (this.x > width) {
-      this.x = -100;
-      this.y = random(0, 100);
-      this.geschwindigkeit = random(0.5, 2);
-    }
-  }
-
-  anzeigen() {
-    image(wolkenBild, this.x, this.y, 100, 60);
-  }
-}
-
 function setup() {
   createCanvas(750, 500);
 
   for (let i = 0; i < 100; i++) {
-    let x = random(-100, width);
-    let y = random(0, 100);
-
-    wolken.push(new Wolke(x, y));
+    wolken.push({
+      x: random(-100, 750),
+      y: random(0, 100),
+      tempo: random(0.5, 2)
+    });
   }
 
-  regler = createSlider(0, 100, 30, 1);
+  regler = createSlider(0, 100, 30);
 
   startKnopf = createButton("Mikrofon starten");
   startKnopf.mousePressed(starteMikrofon);
@@ -70,43 +40,10 @@ async function starteMikrofon() {
   mikrofon = new p5.AudioIn();
   mikrofon.start();
 
+  fft = new p5.FFT(0.8, 2048);
+  fft.setInput(mikrofon);
+
   startKnopf.html("Mikrofon gestartet");
-}
-
-function tonhoeheErkennen() {
-  let signal = mikrofon.getValue();
-  let abtastrate = sampleRate();
-
-  let besteFrequenz = 0;
-  let besteUebereinstimmung = 0;
-
-  let kleinsterAbstand = floor(abtastrate / 400);
-  let groessterAbstand = floor(abtastrate / 80);
-
-  for (let abstand = kleinsterAbstand; abstand <= groessterAbstand; abstand++) {
-    let uebereinstimmung = 0;
-    let energie = 0;
-
-    for (let i = 0; i < signal.length - abstand; i++) {
-      uebereinstimmung += signal[i] * signal[i + abstand];
-      energie += signal[i] * signal[i];
-    }
-
-    if (energie > 0) {
-      uebereinstimmung = uebereinstimmung / energie;
-    }
-
-    if (uebereinstimmung > besteUebereinstimmung) {
-      besteUebereinstimmung = uebereinstimmung;
-      besteFrequenz = abtastrate / abstand;
-    }
-  }
-
-  if (besteUebereinstimmung > 0.8) {
-    return besteFrequenz;
-  }
-
-  return 0;
 }
 
 function draw() {
@@ -114,28 +51,40 @@ function draw() {
 
   let helligkeit = 255;
 
-  if (mikrofon && mikrofon.enabled) {
-    let lautstaerke = mikrofon.getLevel();
+  if (fft && mikrofon.getLevel() > 0.005) {
+    let spektrum = fft.analyze();
+    let frequenz = 0;
+    let staerke = 0;
 
-    if (lautstaerke > 0.01) {
-      let frequenz = tonhoeheErkennen();
-
-      if (frequenz > 0) {
-        helligkeit = map(frequenz, 80, 400, 60, 255);
-        helligkeit = constrain(helligkeit, 60, 255);
+    for (let i = 4; i < 19; i++) {
+      if (spektrum[i] > staerke) {
+        staerke = spektrum[i];
+        frequenz = i * sampleRate() / 2048;
       }
+    }
+
+    if (staerke > 15) {
+      helligkeit = map(frequenz, 80, 400, 60, 255);
+      helligkeit = constrain(helligkeit, 60, 255);
     }
   }
 
   image(sonnenBild, 50, 30, 120, 120);
 
   wolkenHelligkeit = lerp(wolkenHelligkeit, helligkeit, 0.05);
-
   tint(wolkenHelligkeit);
 
   for (let i = 0; i < regler.value(); i++) {
-    wolken[i].bewegen();
-    wolken[i].anzeigen();
+    let wolke = wolken[i];
+
+    wolke.x += wolke.tempo;
+
+    if (wolke.x > width) {
+      wolke.x = -100;
+      wolke.y = random(0, 100);
+    }
+
+    image(wolkenBild, wolke.x, wolke.y, 100, 60);
   }
 
   noTint();
