@@ -7,7 +7,12 @@ let wasserBild;
 let baeumeHintenBild;
 let wiesenBild;
 let vordergrundBild;
-let fft;
+
+let mikrofon;
+let startKnopf;
+let wolken = [];
+let regler;
+
 let wolkenHelligkeit = 255;
 
 function preload() {
@@ -20,12 +25,6 @@ function preload() {
   wiesenBild = loadImage("1wiesen.svg");
   vordergrundBild = loadImage("1vordergrund.svg");
 }
-
-let mikrofon;
-let lautstaerke;
-let startKnopf;
-let wolken = [];
-let regler;
 
 class Wolke {
   constructor(x, y) {
@@ -71,10 +70,43 @@ async function starteMikrofon() {
   mikrofon = new p5.AudioIn();
   mikrofon.start();
 
-  fft = new p5.FFT(0.8, 2048);
-  fft.setInput(mikrofon);
-
   startKnopf.html("Mikrofon gestartet");
+}
+
+function tonhoeheErkennen() {
+  let signal = mikrofon.getValue();
+  let abtastrate = sampleRate();
+
+  let besteFrequenz = 0;
+  let besteUebereinstimmung = 0;
+
+  let kleinsterAbstand = floor(abtastrate / 400);
+  let groessterAbstand = floor(abtastrate / 80);
+
+  for (let abstand = kleinsterAbstand; abstand <= groessterAbstand; abstand++) {
+    let uebereinstimmung = 0;
+    let energie = 0;
+
+    for (let i = 0; i < signal.length - abstand; i++) {
+      uebereinstimmung += signal[i] * signal[i + abstand];
+      energie += signal[i] * signal[i];
+    }
+
+    if (energie > 0) {
+      uebereinstimmung = uebereinstimmung / energie;
+    }
+
+    if (uebereinstimmung > besteUebereinstimmung) {
+      besteUebereinstimmung = uebereinstimmung;
+      besteFrequenz = abtastrate / abstand;
+    }
+  }
+
+  if (besteUebereinstimmung > 0.8) {
+    return besteFrequenz;
+  }
+
+  return 0;
 }
 
 function draw() {
@@ -82,42 +114,23 @@ function draw() {
 
   let helligkeit = 255;
 
-  lautstaerke = 0;
-
   if (mikrofon && mikrofon.enabled) {
-    lautstaerke = mikrofon.getLevel();
-  }
+    let lautstaerke = mikrofon.getLevel();
 
-  if (fft && lautstaerke > 0.01) {
-    let spektrum = fft.analyze();
-    let staerksteFrequenz = 0;
-    let groessteEnergie = 0;
+    if (lautstaerke > 0.01) {
+      let frequenz = tonhoeheErkennen();
 
-    for (let i = 0; i < spektrum.length; i++) {
-      let frequenz = i * sampleRate() / 2048;
-
-      if (frequenz >= 60 && frequenz <= 500) {
-        if (spektrum[i] > groessteEnergie) {
-          groessteEnergie = spektrum[i];
-          staerksteFrequenz = frequenz;
-        }
-      }
-    }
-
-    if (groessteEnergie > 20) {
-      if (staerksteFrequenz < 150) {
-        helligkeit = 70;
-      } else if (staerksteFrequenz < 250) {
-        helligkeit = 170;
-      } else {
-        helligkeit = 255;
+      if (frequenz > 0) {
+        helligkeit = map(frequenz, 80, 400, 60, 255);
+        helligkeit = constrain(helligkeit, 60, 255);
       }
     }
   }
 
   image(sonnenBild, 50, 30, 120, 120);
 
-  wolkenHelligkeit = lerp(wolkenHelligkeit, helligkeit, 0.03);
+  wolkenHelligkeit = lerp(wolkenHelligkeit, helligkeit, 0.05);
+
   tint(wolkenHelligkeit);
 
   for (let i = 0; i < regler.value(); i++) {
