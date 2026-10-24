@@ -8,9 +8,6 @@ let baeumeHintenBild;
 let wiesenBild;
 let vordergrundBild;
 
-let fft;
-let wolkenHelligkeit = 255;
-
 function preload() {
   wolkenBild = loadImage("wolke.svg");
   sonnenBild = loadImage("sonne.svg");
@@ -72,9 +69,6 @@ async function starteMikrofon() {
   mikrofon = new p5.AudioIn();
   mikrofon.start();
 
-  fft = new p5.FFT();
-  fft.setInput(mikrofon);
-
   startKnopf.html("Mikrofon gestartet");
 }
 
@@ -87,23 +81,12 @@ function draw() {
     lautstaerke = mikrofon.getLevel();
   }
 
-  let helligkeit = 255;
-
-  if (fft && lautstaerke > 0.005) {
-    fft.analyze();
-
-    let tief = fft.getEnergy(60, 150);
-    let hoch = fft.getEnergy(250, 500);
-
-    helligkeit = map(tief - hoch, -100, 100, 255, 60);
-    helligkeit = constrain(helligkeit, 60, 255);
-  }
-
-  wolkenHelligkeit = lerp(wolkenHelligkeit, helligkeit, 0.05);
-
   image(sonnenBild, 50, 30, 120, 120);
 
-  tint(wolkenHelligkeit);
+  let helligkeit = map(lautstaerke, 0, 0.2, 255, 60);
+  helligkeit = constrain(helligkeit, 60, 255);
+
+  tint(helligkeit);
 
   for (let i = 0; i < regler.value(); i++) {
     wolken[i].bewegen();
