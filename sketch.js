@@ -84,11 +84,14 @@ function draw() {
   if (fft) {
     fft.analyze();
 
-    let tief = fft.getEnergy("bass");
-    let hoch = fft.getEnergy("treble");
+    let tief = fft.getEnergy(60, 130);
 
-    if (tief + hoch > 10) {
-      helligkeit = map(hoch / (tief + hoch), 0, 1, 70, 255);
+    if (tief > 160) {
+      helligkeit = 70;
+    } else if (tief > 100) {
+      helligkeit = 170;
+    } else {
+      helligkeit = 255;
     }
   }
 
