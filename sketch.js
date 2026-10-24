@@ -79,6 +79,12 @@ function draw() {
   if (mikrofon && mikrofon.enabled) {
     lautstaerke = mikrofon.getLevel();
   }
+image(sonnenBild, 50, 30, 120, 120);
+	
+for (let i = 0; i < regler.value(); i++) {
+  wolken[i].bewegen();
+  wolken[i].anzeigen();
+}
 
 image(bergeBild, 0, 0, 750, 500);
 image(huegelBild, 0, 0, 750, 500);
@@ -86,10 +92,5 @@ image(wasserBild, 0, 0, 750, 500);
 image(baeumeHintenBild, 0, 0, 750, 500);
 image(wiesenBild, 0, 0, 750, 500);
 image(vordergrundBild, 0, 0, 750, 500);
-image(sonnenBild, 50, 30, 120, 120);
 	
-for (let i = 0; i < regler.value(); i++) {
-  wolken[i].bewegen();
-  wolken[i].anzeigen();
-}
 }
