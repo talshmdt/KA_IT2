@@ -3,12 +3,14 @@ let wolkenBild;
 let sonnenBild;
 let bergeBild;
 let umgebungBild;
+let wasserBild;
 
 function preload() {
   wolkenBild = loadImage("wolke.svg");
   sonnenBild = loadImage("sonne.svg");
   bergeBild = loadImage("berge.svg");
   umgebungBild = loadImage("umgebung.svg");
+  wasserBild = loadImage("wasser.svg");
 }
 let mikrofon;
 let lautstaerke;
@@ -73,6 +75,7 @@ function draw() {
   }
 
 image(bergeBild, 0,0, 800, 500);
+image(wasserBild, 0, 0, 800, 500);
 image(umgebungBild, 0, 0, 800, 500);
 image(sonnenBild, 50, 30, 120, 120);
 	
