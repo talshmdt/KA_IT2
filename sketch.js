@@ -52,7 +52,7 @@ function setup() {
   createCanvas(750, 500);
 
   for (let i = 0; i < 100; i++) {
-    let x = random(-100, 800);
+    let x = random(-100, width);
     let y = random(0, 100);
 
     wolken.push(new Wolke(x, y));
@@ -70,7 +70,7 @@ async function starteMikrofon() {
   mikrofon = new p5.AudioIn();
   mikrofon.start();
 
-  fft = new p5.FFT();
+  fft = new p5.FFT(0.8, 2048);
   fft.setInput(mikrofon);
 
   startKnopf.html("Mikrofon gestartet");
@@ -81,24 +81,37 @@ function draw() {
 
   let helligkeit = 255;
 
-  if (fft) {
-    fft.analyze();
-
-    let tief = fft.getEnergy(60, 130);
-
-    if (tief > 160) {
-      helligkeit = 70;
-    } else if (tief > 100) {
-      helligkeit = 170;
-    } else {
-      helligkeit = 255;
-    }
-  }
-
   lautstaerke = 0;
 
   if (mikrofon && mikrofon.enabled) {
     lautstaerke = mikrofon.getLevel();
+  }
+
+  if (fft && lautstaerke > 0.01) {
+    let spektrum = fft.analyze();
+    let staerksteFrequenz = 0;
+    let groessteEnergie = 0;
+
+    for (let i = 0; i < spektrum.length; i++) {
+      let frequenz = i * sampleRate() / 2048;
+
+      if (frequenz >= 60 && frequenz <= 500) {
+        if (spektrum[i] > groessteEnergie) {
+          groessteEnergie = spektrum[i];
+          staerksteFrequenz = frequenz;
+        }
+      }
+    }
+
+    if (groessteEnergie > 20) {
+      if (staerksteFrequenz < 150) {
+        helligkeit = 70;
+      } else if (staerksteFrequenz < 250) {
+        helligkeit = 170;
+      } else {
+        helligkeit = 255;
+      }
+    }
   }
 
   image(sonnenBild, 50, 30, 120, 120);
