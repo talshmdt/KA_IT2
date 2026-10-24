@@ -72,8 +72,8 @@ function draw() {
     lautstaerke = mikrofon.getLevel();
   }
 
-image(bergeBild, 0,250, 800, 250);
-image(umgebungBild, 0, 350, 800, 150);
+image(bergeBild, 0,0, 800, 500);
+image(umgebungBild, 0, 0, 800, 500);
 image(sonnenBild, 50, 30, 120, 120);
 	
 for (let i = 0; i < regler.value(); i++) {
