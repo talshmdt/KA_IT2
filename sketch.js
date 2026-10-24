@@ -8,6 +8,7 @@ let baeumeHintenBild;
 let wiesenBild;
 let vordergrundBild;
 let fft;
+let wolkenHelligkeit = 255;
 
 function preload() {
   wolkenBild = loadImage("wolke.svg");
@@ -116,7 +117,8 @@ function draw() {
 
   image(sonnenBild, 50, 30, 120, 120);
 
-  tint(helligkeit);
+  wolkenHelligkeit = lerp(wolkenHelligkeit, helligkeit, 0.03);
+  tint(wolkenHelligkeit);
 
   for (let i = 0; i < regler.value(); i++) {
     wolken[i].bewegen();
