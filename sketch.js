@@ -7,6 +7,7 @@ let wasserBild;
 let baeumeHintenBild;
 let wiesenBild;
 let vordergrundBild;
+let fft;
 
 function preload() {
   wolkenBild = loadImage("wolke.svg");
@@ -16,8 +17,9 @@ function preload() {
   wasserBild = loadImage("1wasser.svg");
   baeumeHintenBild = loadImage("1baeumehinten.svg");
   wiesenBild = loadImage("1wiesen.svg");
-  vordergrundBild = loadImage("1vordergrund.svg")
+  vordergrundBild = loadImage("1vordergrund.svg");
 }
+
 let mikrofon;
 let lautstaerke;
 let startKnopf;
@@ -45,18 +47,18 @@ class Wolke {
     image(wolkenBild, this.x, this.y, 100, 60);
   }
 }
+
 function setup() {
   createCanvas(750, 500);
 
- 
-for (let i = 0; i < 100; i++) {
-  let x = random(-100, 800);
-  let y = random(0, 100);
+  for (let i = 0; i < 100; i++) {
+    let x = random(-100, 800);
+    let y = random(0, 100);
 
-  wolken.push(new Wolke(x, y));
-}
+    wolken.push(new Wolke(x, y));
+  }
 
-regler = createSlider(0, 100, 30, 1);
+  regler = createSlider(0, 100, 30, 1);
 
   startKnopf = createButton("Mikrofon starten");
   startKnopf.mousePressed(starteMikrofon);
@@ -68,29 +70,49 @@ async function starteMikrofon() {
   mikrofon = new p5.AudioIn();
   mikrofon.start();
 
+  fft = new p5.FFT();
+  fft.setInput(mikrofon);
+
   startKnopf.html("Mikrofon gestartet");
 }
 
 function draw() {
   background(135, 206, 235);
 
+  let helligkeit = 255;
+
+  if (fft) {
+    fft.analyze();
+
+    let tief = fft.getEnergy("bass");
+    let hoch = fft.getEnergy("treble");
+
+    if (tief + hoch > 10) {
+      helligkeit = map(hoch / (tief + hoch), 0, 1, 70, 255);
+    }
+  }
+
   lautstaerke = 0;
 
   if (mikrofon && mikrofon.enabled) {
     lautstaerke = mikrofon.getLevel();
   }
-image(sonnenBild, 50, 30, 120, 120);
-	
-for (let i = 0; i < regler.value(); i++) {
-  wolken[i].bewegen();
-  wolken[i].anzeigen();
-}
 
-image(bergeBild, 0, 0, 750, 500);
-image(huegelBild, 0, 0, 750, 500);
-image(wasserBild, 0, 0, 750, 500);
-image(baeumeHintenBild, 0, 0, 750, 500);
-image(wiesenBild, 0, 0, 750, 500);
-image(vordergrundBild, 0, 0, 750, 500);
-	
+  image(sonnenBild, 50, 30, 120, 120);
+
+  tint(helligkeit);
+
+  for (let i = 0; i < regler.value(); i++) {
+    wolken[i].bewegen();
+    wolken[i].anzeigen();
+  }
+
+  noTint();
+
+  image(bergeBild, 0, 0, 750, 500);
+  image(huegelBild, 0, 0, 750, 500);
+  image(wasserBild, 0, 0, 750, 500);
+  image(baeumeHintenBild, 0, 0, 750, 500);
+  image(wiesenBild, 0, 0, 750, 500);
+  image(vordergrundBild, 0, 0, 750, 500);
 }
