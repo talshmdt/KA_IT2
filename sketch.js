@@ -7,8 +7,8 @@ let umgebungBild;
 function preload() {
   wolkenBild = loadImage("wolke.svg");
   sonnenBild = loadImage("sonne.svg");
-  bergeBild = loadimage("berge.svg");
-  umgebungBild = loadimage("umgebung.svg")
+  bergeBild = loadImage("berge.svg");
+  umgebungBild = loadImage("umgebung.svg");
 }
 let mikrofon;
 let lautstaerke;
