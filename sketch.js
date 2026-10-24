@@ -51,7 +51,7 @@ function draw() {
 
   let helligkeit = 255;
 
-  if (fft && mikrofon.getLevel() > 0.005) {
+  if (fft && mikrofon && mikrofon.enabled && mikrofon.getLevel() > 0.005) {
     let spektrum = fft.analyze();
     let frequenz = 0;
     let staerke = 0;
@@ -59,7 +59,7 @@ function draw() {
     for (let i = 4; i < 19; i++) {
       if (spektrum[i] > staerke) {
         staerke = spektrum[i];
-        frequenz = i * sampleRate() / 2048;
+        frequenz = i * getAudioContext().sampleRate / 2048;
       }
     }
 
