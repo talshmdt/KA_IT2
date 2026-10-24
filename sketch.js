@@ -2,11 +2,13 @@
 let wolkenBild;
 let sonnenBild;
 let bergeBild;
+let umgebungBild;
 
 function preload() {
   wolkenBild = loadImage("wolke.svg");
   sonnenBild = loadImage("sonne.svg");
   bergeBild = loadimage("berge.svg");
+  umgebungBild = loadimage("umgebung.svg")
 }
 let mikrofon;
 let lautstaerke;
@@ -71,6 +73,7 @@ function draw() {
   }
 
 image(bergeBild, 0,250, 800, 250);
+image(umgebungBild, 0, 350, 800, 150);
 image(sonnenBild, 50, 30, 120, 120);
 	
 for (let i = 0; i < regler.value(); i++) {
