@@ -4,6 +4,7 @@ let sonnenBild;
 let bergeBild;
 let umgebungBild;
 let wasserBild;
+let baeumeBild;
 
 function preload() {
   wolkenBild = loadImage("wolke.svg");
@@ -11,6 +12,7 @@ function preload() {
   bergeBild = loadImage("berge.svg");
   umgebungBild = loadImage("umgebung.svg");
   wasserBild = loadImage("wasser.svg");
+  baeumeBild = loadImage("baeume.svg");
 }
 let mikrofon;
 let lautstaerke;
@@ -77,6 +79,7 @@ function draw() {
 image(bergeBild, 0,0, 800, 500);
 image(wasserBild, 0, 0, 800, 500);
 image(umgebungBild, 0, 0, 800, 500);
+image(baeumeBild, 0, 0, 800, 500);
 image(sonnenBild, 50, 30, 120, 120);
 	
 for (let i = 0; i < regler.value(); i++) {
