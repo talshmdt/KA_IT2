@@ -60,7 +60,7 @@ for (let i = 0; i < 100; i++) {
     let x = random(-100, 800);
     let y = random(0, 100);
     
-    wolken.push(new Wolke(x, y));} // Erstellt eine neue Wolke und speichert sie im Array
+    wolken.push(new Wolke(x, y));} // Erstellt eine neue Wolke (Objekt) und speichert sie im Array
     regler = createSlider(0, 100, 30, 1); // Erstellt einen Regler für 0 bis 100 Wolken (beim Start werden 30 Wolken angezeigt)
     startKnopf = createButton("Mikrofon starten"); // Erstellt einen Button zum Starten des Mikrofons
     startKnopf.mousePressed(starteMikrofon);} // Beim Klicken wird die Funktion "starteMikrofon" ausgeführt
