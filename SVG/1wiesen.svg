@@ -1,0 +1,111 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="Ebene_2" data-name="Ebene 2" viewBox="0 0 750 500" width="750" height="500">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+
+      .cls-2 {
+        fill: #547c35;
+      }
+
+      .cls-3 {
+        fill: #85cbff;
+      }
+
+      .cls-4 {
+        fill: #aec2cf;
+      }
+
+      .cls-5 {
+        fill: #4b7036;
+      }
+
+      .cls-6 {
+        fill: #a6eeff;
+        mix-blend-mode: screen;
+      }
+
+      .cls-6, .cls-7, .cls-8 {
+        isolation: isolate;
+      }
+
+      .cls-6, .cls-8 {
+        opacity: .3;
+      }
+
+      .cls-9 {
+        fill: #6d9127;
+      }
+
+      .cls-10 {
+        fill: #fff;
+      }
+
+      .cls-11 {
+        fill: #64871f;
+      }
+
+      .cls-12 {
+        fill: #6f9643;
+      }
+
+      .cls-13 {
+        fill: #57751b;
+      }
+
+      .cls-14 {
+        fill: #41612f;
+      }
+
+      .cls-15 {
+        fill: #57b7f2;
+      }
+
+      .cls-16 {
+        fill: #c3d4de;
+      }
+
+      .cls-8 {
+        fill: #4f6633;
+        mix-blend-mode: multiply;
+      }
+
+      .cls-17 {
+        fill: #634336;
+      }
+
+      .cls-18 {
+        fill: #6b7c80;
+      }
+
+      .cls-19 {
+        fill: #536063;
+      }
+
+      .cls-20 {
+        fill: #8ab041;
+      }
+
+      .cls-21 {
+        clip-path: url(#clippath);
+      }
+    </style>
+    <clipPath id="clippath">
+      <rect class="cls-1" width="750" height="500"/>
+    </clipPath>
+  </defs>
+  <g id="Ebene_1-2" data-name="Ebene 1">
+    <g class="cls-7">
+      <g id="OBJECTS">
+        <g class="cls-21">
+          <g>
+            <path class="cls-9" d="M261.37,298.86l-322.09-.6-.24-88.3s240.78-23.07,322.33,88.9h0Z"/>
+            <path class="cls-20" d="M898.41,453.75c-121.48-31.63-305.06-59.16-510.48-59.16S-1.08,422.12-122.55,453.75v151.38h1020.97v-151.38h-.01Z"/>
+            </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
