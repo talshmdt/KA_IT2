@@ -12,4 +12,3 @@ button:disabled { opacity: .5; cursor: default; }
 #status { margin-top: 12px; font-weight: bold; }
 #zeichenflaeche { overflow-x: auto; }
 canvas { display: block; max-width: 100%; height: auto !important; }
-.hinweis { font-size: .9rem; }
