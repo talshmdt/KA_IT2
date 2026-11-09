@@ -86,7 +86,7 @@ function setup() {
   let reglerZeile = createDiv();
   reglerZeile.class("reglerreihe");
   reglerZeile.parent(steuerung);
-  wolkenRegler = erstelleRegler(reglerZeile, "Anzahl der Wolken", 0, 100, 30, 1); // Regler für die Anzahl der sichtbaren Wolken (Werte von 0 bis 100, Startwert 30)
+  wolkenRegler = erstelleRegler(reglerZeile, "Anzahl der Wolken", 0, 100, 30, 1); // Regler für die Anzahl der sichtbaren Wolken (Werte von 0 bis 100, Startwert 30, Schrittgröße 1)
   wolkenSchwelle = erstelleRegler(reglerZeile, "Wolken-Empfindlichkeit", 1, 100, 50, 1); // Regler für die Empfindlichkeit der Wolken (Je höher der Wert, desto stärker reagieren die Wolken auf leise Signale)
   baumSchwelle = erstelleRegler(reglerZeile, "Baum-Schwellenwert", 0, 255, 100, 1); // Regler für den Schwellenwert der Bäume (Je niedriger der Wert, desto leichter beginnen die Bäume zu wackeln)
   statusText = createP("Status: Audio aus"); // Erstellt einen Text, der den aktuellen Zustand des Programms anzeigt

@@ -1,14 +1,62 @@
-* { box-sizing: border-box; }
-body { margin: 0; background: #edf5f8; color: #193448; font-family: Arial, sans-serif; }
-main { max-width: 850px; padding: 18px; margin: auto; }
-h1 { margin-bottom: 8px; }
-p { line-height: 1.45; }
-#steuerung { background: white; border-radius: 10px; padding: 14px; margin: 16px 0; }
-.knopfreihe { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-button { padding: 9px 13px; border: 1px solid #66889a; border-radius: 6px; background: #e5f1f6; cursor: pointer; }
-button:disabled { opacity: .5; cursor: default; }
-.reglerreihe { display: flex; flex-wrap: wrap; gap: 14px; }
-.reglergruppe { display: flex; flex-direction: column; min-width: 180px; gap: 5px; }
-#status { margin-top: 12px; font-weight: bold; }
-#zeichenflaeche { overflow-x: auto; }
-canvas { display: block; max-width: 100%; height: auto !important; }
+
+/* Hintergrundfarbe, Textfarbe und Schriftart */
+body {
+  margin: 0;
+  background: #edf5f8;
+  color: #193448;
+  font-family: Arial, sans-serif;
+}
+
+/*Größe und Position der Webseite */
+main {
+  max-width: 850px;
+  padding: 18px;
+  margin: auto;
+}
+
+/* Bereich mit Buttons und Reglern */
+#steuerung {
+  background: white;
+  border-radius: 10px;
+  padding: 14px;
+  margin: 16px 0;
+}
+
+/* Ordnet die Buttons nebeneinander an */
+.knopfreihe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* Aussehen der Buttons */
+button {
+  padding: 9px 13px;
+  border: 1px solid #66889a;
+  border-radius: 6px;
+  background: #e5f1f6;
+  cursor: pointer;
+}
+
+/* Ordnet die Regler nebeneinander an */
+.reglerreihe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+/* Ordnet die Beschriftung über dem Regler an */
+.reglergruppe {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  gap: 5px;
+}
+
+/* Passt die Landschaft an die Bildschirmbreite an */
+canvas {
+  display: block;
+  max-width: 100%;
+  height: auto !important;
+}
