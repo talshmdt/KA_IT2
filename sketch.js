@@ -1,16 +1,16 @@
+// let -> Variable (beschrifteter Behälter)
 let wolkenBild, sonnenBild, bergeBild, huegelBild, wasserBild, wiesenBild, vordergrundBild; // Erstellung der Variablen für die Bilder der Landschaft
-let mikrofon, fft, lautstaerke = 0; // Erstellung der Variablen für den Audioeingang und die Lautstärke
-let wolken = [], baeume = []; // Erstellung zwei Arrays (Listen), in denen die Wolken und Bäume gespeichert werden
+let mikrofon, fft, lautstaerke = 0; // Erstellung der Variablen für mikrofon = Audioeingang, fft = Frequenzanalyse, lautstaerke = aktuell gemessene Lautstärke (Startwert 0)
+let wolken = [], baeume = []; // Erstellung zwei Arrays (Listen, durch []), in denen die Wolken und Bäume gespeichert werden
 let wolkenRegler, wolkenSchwelle, baumSchwelle; // Erstellung der Variablen für die drei Regler
-let startKnopf, stoppKnopf, demoKnopf, statusText; // Erstellung der Variablen für die Buttons und den Statustext
-// Legt fest, welcher Modus gerade aktiv ist
-// "aus"= keine Audio, "audio"= echtes Audiosignal, "demo"= Demo-Modus
-let modus = "aus"; 
-let demoZeit = 0; // Zählt die Zeit im Demo-Modus
+let startKnopf, stoppKnopf, demoKnopf, statusText; // Erstellung der Variablen für die Buttons (Bedienung der Webseite) und den Statustext
+let modus = "aus"; // speichert aktuellen Betriebszustand ("aus", "demo" oder "audio"), beim Start "aus", da Audioiengang erst gestartet werden soll
+let demoZeit = 0; // Zählt wie viele Zeichendurchläufe seit dem Start des Demo-Modus vergangen sind für zeitlich wechselnde Reaktion (Bäume, Wolken), Startwert 0
 
+// function -> zusammengehöriger Programmabschnitt für eine bestimmte Aufgabe
 // Lädt alle Bilder (bevor das Programm startet)
 function preload() {
-  wolkenBild = loadImage("wolke.svg");
+  wolkenBild = loadImage("wolke.svg"); // loadImage lädt eine Bilddatei, das geladene Bild wird in Variable (wolkenBild) gespeichert
   sonnenBild = loadImage("sonne.svg");
   bergeBild = loadImage("1berge.svg");
   huegelBild = loadImage("1huegel.svg");
@@ -27,31 +27,30 @@ baeume = [
   new Baum(loadImage("baum_vorne_1.svg"), false, 639, 330, 350, 700, 0.23),
   new Baum(loadImage("baum_vorne_2.svg"), false, 660, 495, 700, 1300, 0.17),
   new Baum(loadImage("baum_vorne_3.svg"), false, 119, 265, 1300, 2600, 0.12),
-  new Baum(loadImage("baum_vorne_4.svg"), false, 125, 495, 2600, 5000, 0.08)
-];
+  new Baum(loadImage("baum_vorne_4.svg"), false, 125, 495, 2600, 5000, 0.08)];
 
-// Erstellung einer Klasse (Bauplan) für alle Wolken
+// Erstellung einer Klasse (Bauplan) für alle Wolken (Objekte)
 class Wolke {
-  // Legt die Anfangswerte einer Wolke fest
-  constructor(x, y) {
-    this.x = x; // Waagerechte Position
-    this.y = y; // Senkrechte Position
-    this.geschwindigkeit = random(0.5, 2);} // Zufällige Geschwindigkeit
+  constructor(x, y) { // wird ausgeführt, wenn man eine neue Wolke erstellt (new Wolke)
+    this.x = x; // this = Eigenschaft gehört zu diesem Objekt, Waagerechte Position wird in der Wolke gespeichert
+    this.y = y; // Senkrechte Position wird in der Wolke gespeichert
+    this.geschwindigkeit = random(0.5, 2);} // Zufällige Geschwindigkeit (zwischen 0,5-2) wird in der Wolke gespeichert
 	
   // Methode zum Bewegen der Wolke
   bewegen() {
-    this.x += this.geschwindigkeit; // Bewegt die Wolke nach rechts
-	// Prüft, ob die Wolke den rechten Rand verlassen hat
-    if (this.x > width) {
+    this.x = this.x + this.geschwindigkeit; // x-Position wird bei jedem Methodenaufruf erhöht (bewegt die Wolke nach rechts)
+	  
+	// Wenn die Wolke den rechten Rand der Zeichenfläche überschritten hat, wird sie wieder links eingesetzt (neue Höhe + Geschwindigkeit)
+    if (this.x > width) { // Wenn x-Position größer als Gesambreite
       this.x = -100; // Setzt die Wolke wieder an den linken Rand
-      this.y = random(0, 100); // Gibt ihr eine neue zufällige Höhe
-      this.geschwindigkeit = random(0.5, 2);}} // Gibt ihr eine neue Geschwindigkeit
+      this.y = random(0, 100); // Gibt der Wolke eine neue zufällige Höhe
+      this.geschwindigkeit = random(0.5, 2);}} // Gibt der Wolke eine neue zufällige Geschwindigkeit
 	
   // Methode zum Anzeigen der Wolke
   anzeigen() {
-    image(wolkenBild, this.x, this.y, 100, 60);}} // Zeichnet die Wolke mit 100 x 60 Pixeln
+    image(wolkenBild, this.x, this.y, 100, 60);}} // Zeichnet die Wolke mit 100 x 60 Pixeln (Bild, x, y, Breite, Höhe) -> Wolken größer?
 
- // Erstellung einer Klasse (Bauplan) für alle Bäume
+  // Erstellung einer Klasse (Bauplan) für alle Bäume (Objekte)
 class Baum {
   // Legt die Eigenschaften eines Baumes fest
   constructor(bild, hinten, x, y, tief, hoch, tempo) {
@@ -63,6 +62,37 @@ class Baum {
     this.hoch = hoch;       // Höchste Frequenz
     this.tempo = tempo;     // Geschwindigkeit des Wackelns
     this.winkel = 0;        // Anfangswinkel des Baumes
+  }
+
+  // Methode zum Bewegen des Baumes
+  bewegen(energie) {
+    let zielWinkel = 0; // Der Baum soll zunächst gerade stehen
+
+    // Prüft, ob die Energie größer als der Schwellenwert ist
+    if (energie > baumSchwelle.value()) {
+
+      // Berechnet die Wackelbewegung mit einer Sinuskurve
+      zielWinkel = sin(frameCount * this.tempo) * 0.035;
+    }
+
+    // Verändert den Winkel langsam für eine weichere Bewegung
+    this.winkel = lerp(this.winkel, zielWinkel, 0.2);
+  }
+
+  // Methode zum Zeichnen des Baumes
+  anzeigen() {
+    push(); // Speichert die Zeicheneinstellungen
+
+    // Verschiebt den Drehpunkt an die Position des Baumes
+    translate(this.x, this.y);
+
+    // Dreht den Baum um den berechneten Winkel
+    rotate(this.winkel);
+
+    // Zeichnet das SVG-Bild
+    image(this.bild, -this.x, -this.y, 750, 500);
+
+    pop(); // Stellt die Zeicheneinstellungen wieder her
   }
 }
 
@@ -198,33 +228,25 @@ function baumEnergie(baum, nummer) {
     return phase < 1.5 ? 190 : 0;}
 	return 0;} // Ohne Audio und Demo gibt es keine Energie
 
-// Zeichnet die Bäume und lässt sie bei passenden Frequenzen wackeln
+// Bewegt und zeichnet die Bäume
 function zeichneBaeume(hinten) {
 
-  // Geht mit einer For-Schleife alle Bäume im Array durch
+  // Geht alle Bäume im Array durch
   for (let i = 0; i < baeume.length; i++) {
+
     let baum = baeume[i]; // Wählt den aktuellen Baum aus
-    if (baum.hinten !== hinten) continue; // Prüft, ob der Baum im Hintergrund oder Vordergrund steht (Nicht passende Bäume werden in diesem Durchlauf übersprungen)
-    let energie = baumEnergie(baum, i); // Ermittelt die Energie im Frequenzbereich des Baumes
-    let zielWinkel = 0; // Der Baum soll zunächst gerade stehen
-    if (energie > baumSchwelle.value()) { // Prüft, ob die Energie größer als der eingestellte Schwellenwert ist
-	  // Berechnet die Wackelbewegung mit einer Sinuskurve
-      // frameCount zählt, wie oft die Zeichnung bereits aktualisiert wurde
-      // baum.tempo bestimmt, wie schnell der Baum wackelt
-      // 0.035 bestimmt, wie weit sich der Baum dreht
-      zielWinkel = sin(frameCount * baum.tempo) * 0.035;}
-    
-	// Verändert den Winkel langsam, damit die Bewegung weicher aussieht
-    // Bei zu wenig Energie bewegt sich der Baum zurück in seine Ausgangsposition
-    baum.winkel = lerp(baum.winkel, zielWinkel, 0.2);
-    push(); // Speichert die bisherigen Zeicheneinstellungen
-    translate(baum.x, baum.y); // Verschiebt den Drehpunkt an die Position des Baumes
-    rotate(baum.winkel); // Dreht den Baum um den berechneten Winkel
-	  
-	// Zeichnet das SVG-Bild an der richtigen Stelle
-    // Die negative Position gleicht die Verschiebung des Drehpunktes aus
-    image(baum.bild, -baum.x, -baum.y, 750, 500);
-    pop();}} // Stellt die ursprünglichen Zeicheneinstellungen wieder her
+
+    // Prüft, ob der Baum zur richtigen Ebene gehört
+    if (baum.hinten !== hinten) continue;
+
+    // Ermittelt die Energie im Frequenzbereich des Baumes
+    let energie = baumEnergie(baum, i);
+
+    // Ruft die Bewegungsmethode des Baumes auf
+    baum.bewegen(energie);
+
+    // Ruft die Zeichenmethode des Baumes auf
+    baum.anzeigen();}}
 
 // Diese Funktion wird ständig wiederholt (ca. 60-mal pro Sekunde)
 function draw() {
