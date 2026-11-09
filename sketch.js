@@ -18,18 +18,17 @@ function preload() {
   wiesenBild = loadImage("1wiesen.svg");
   vordergrundBild = loadImage("vordergrund_ohne_baeume.svg");
 
-// Jede Baumgruppe hat eine eigene SVG-Datei und einen Frequenzbereich in Hz.
-// Tiefe Frequenzen führen zu schnellerem Wackeln.
-// tief = niedrigste Frequenz, auf die der Baum reagiert (in Hertz)
-// hoch = höchste Frequenz, auf die der Baum reagiert (in Hertz)
-// tempo = Geschwindigkeit, mit der der Baum wackelt
-  baeume = [
-    {bild: loadImage("baum_hinten_1.svg"), hinten: true, x: 39, y: 235, tief: 60, hoch: 180, tempo: 0.35, winkel: 0},
-    {bild: loadImage("baum_hinten_2.svg"), hinten: true, x: 735, y: 220, tief: 180, hoch: 350, tempo: 0.29, winkel: 0},
-    {bild: loadImage("baum_vorne_1.svg"), hinten: false, x: 639, y: 330, tief: 350, hoch: 700, tempo: 0.23, winkel: 0},
-    {bild: loadImage("baum_vorne_2.svg"), hinten: false, x: 660, y: 495, tief: 700, hoch: 1300, tempo: 0.17, winkel: 0},
-    {bild: loadImage("baum_vorne_3.svg"), hinten: false, x: 119, y: 265, tief: 1300, hoch: 2600, tempo: 0.12, winkel: 0},
-    {bild: loadImage("baum_vorne_4.svg"), hinten: false, x: 125, y: 495, tief: 2600, hoch: 5000, tempo: 0.08, winkel: 0}];}
+// Array (Liste) um Bäume (Objekte) zu erstellen
+// true -> Hintergrund
+// x-Position, y-Position, niedrigste Frequenz, höchste Frequenz, Geschwindigkeit Wackeln
+baeume = [
+  new Baum(loadImage("baum_hinten_1.svg"), true, 39, 235, 60, 180, 0.35),
+  new Baum(loadImage("baum_hinten_2.svg"), true, 735, 220, 180, 350, 0.29),
+  new Baum(loadImage("baum_vorne_1.svg"), false, 639, 330, 350, 700, 0.23),
+  new Baum(loadImage("baum_vorne_2.svg"), false, 660, 495, 700, 1300, 0.17),
+  new Baum(loadImage("baum_vorne_3.svg"), false, 119, 265, 1300, 2600, 0.12),
+  new Baum(loadImage("baum_vorne_4.svg"), false, 125, 495, 2600, 5000, 0.08)
+];
 
 // Erstellung einer Klasse (Bauplan) für alle Wolken
 class Wolke {
@@ -51,6 +50,21 @@ class Wolke {
   // Methode zum Anzeigen der Wolke
   anzeigen() {
     image(wolkenBild, this.x, this.y, 100, 60);}} // Zeichnet die Wolke mit 100 x 60 Pixeln
+
+ // Erstellung einer Klasse (Bauplan) für alle Bäume
+class Baum {
+  // Legt die Eigenschaften eines Baumes fest
+  constructor(bild, hinten, x, y, tief, hoch, tempo) {
+    this.bild = bild;       // SVG-Bild des Baumes
+    this.hinten = hinten;   // Hintergrund oder Vordergrund
+    this.x = x;             // Waagerechte Position
+    this.y = y;             // Senkrechte Position
+    this.tief = tief;       // Niedrigste Frequenz
+    this.hoch = hoch;       // Höchste Frequenz
+    this.tempo = tempo;     // Geschwindigkeit des Wackelns
+    this.winkel = 0;        // Anfangswinkel des Baumes
+  }
+}
 
 // Funktion wird einmal beim Start des Programms ausgeführt
 function setup() {
@@ -117,7 +131,7 @@ function erstelleRegler(eltern, name, min, max, wert, schritt) {
 // Das Audiosignal soll vom Synthesizer über das Audio-Interface kommen
 async function starteMikrofon() {
   stoppeAlles(); // Stoppt zuerst eine möglicherweise laufende Audioanalyse oder Demo
-  statusText.html("Status: Audio wird gestartet ...");  // Zeigt an, dass das Audiosignal gestartet wird
+  statusText.html("Status: Audio wird gestartet...");  // Zeigt an, dass das Audiosignal gestartet wird
   try {
     // Der Browser fragt erst nach dem Klick nach der Audiofreigabe
     await userStartAudio(); // Fordert die Erlaubnis für den Audiozugriff an
