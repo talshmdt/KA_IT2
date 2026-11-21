@@ -1,9 +1,9 @@
-
 let wolkenBild, sonnenBild, bergeBild, huegelBild, wasserBild, wiesenBild, vordergrundBild;
 let einzelBaumBild; // Bild für die neue Baumreihe
 
 let mikrofon, fft, lautstaerke = 0;
 let wolken = [], baeume = [], hintergrundBaeume = [];
+let regentropfen = [];
 
 let wolkenRegler, wolkenSchwelle, baumSchwelle, hintergrundRegler;
 let startKnopf, stoppKnopf, demoKnopf, statusText;
@@ -41,14 +41,14 @@ function preload() {
   // Erstellt acht zusätzliche Bäume hinter der Wasserfläche
   // Jeder Baum bekommt eine eigene Position und einen Frequenzbereich
   hintergrundBaeume = [
-    new Baum(einzelBaumBild, true, 80, 290, 60, 150, 0.35, true),
-    new Baum(einzelBaumBild, true, 165, 290, 150, 300, 0.31, true),
-    new Baum(einzelBaumBild, true, 250, 290, 300, 500, 0.27, true),
-    new Baum(einzelBaumBild, true, 335, 290, 500, 800, 0.23, true),
-    new Baum(einzelBaumBild, true, 420, 290, 800, 1200, 0.19, true),
-    new Baum(einzelBaumBild, true, 505, 290, 1200, 2000, 0.15, true),
-    new Baum(einzelBaumBild, true, 590, 290, 2000, 3200, 0.11, true),
-    new Baum(einzelBaumBild, true, 675, 290, 3200, 5000, 0.08, true)
+    new Baum(einzelBaumBild, true, 80, 255, 60, 150, 0.35, true),
+    new Baum(einzelBaumBild, true, 165, 253, 150, 300, 0.31, true),
+    new Baum(einzelBaumBild, true, 250, 253, 300, 500, 0.27, true),
+    new Baum(einzelBaumBild, true, 335, 255, 500, 800, 0.23, true),
+    new Baum(einzelBaumBild, true, 420, 250, 800, 1200, 0.19, true),
+    new Baum(einzelBaumBild, true, 505, 247, 1200, 2000, 0.15, true),
+    new Baum(einzelBaumBild, true, 590, 250, 2000, 3200, 0.11, true),
+    new Baum(einzelBaumBild, true, 675, 252, 3200, 5000, 0.08, true)
   ];
 }
 
@@ -132,6 +132,52 @@ class Baum {
 }
 
 
+// Erstellung einer Klasse für alle Regentropfen
+class Regentropfen {
+
+  constructor() {
+    this.x = random(0, 750);
+    this.y = random(50, 100);
+    this.zielY = random(270, 400);
+    this.kreis = 0;
+  }
+
+  bewegen() {
+    // Regentropfen fällt nach unten
+    if (this.y < this.zielY) {
+      this.y += 10;
+    } else {
+      // Kreis wird größer
+      this.kreis += 0.5;
+    }
+
+    // Regentropfen startet erneut
+    if (this.kreis > 40) {
+      this.x = random(0, 750);
+      this.y = random(50, 100);
+      this.kreis = 0;
+    }
+  }
+
+  anzeigen() {
+    push();
+
+    if (this.y < this.zielY) {
+      // Regentropfen zeichnen
+      stroke(200, 230, 255);
+      line(this.x, this.y - 10, this.x, this.y);
+    } else {
+      // Kreis zeichnen und ausblenden
+      noFill();
+      stroke(255, 255, 255, 255 - this.kreis * 6);
+      ellipse(this.x, this.zielY, this.kreis, this.kreis / 3);
+    }
+
+    pop();
+  }
+}
+
+
 // Wird einmal beim Start des Programms ausgeführt
 function setup() {
   let zeichenflaeche = createCanvas(750, 500);
@@ -140,6 +186,11 @@ function setup() {
   // Erstellt 100 Wolken mit zufälligen Positionen
   for (let i = 0; i < 100; i++) {
     wolken.push(new Wolke(random(-100, 800), random(0, 100)));
+  }
+
+  // Erstellt 30 Regentropfen
+  for (let i = 0; i < 30; i++) {
+    regentropfen.push(new Regentropfen());
   }
 
   let steuerung = select("#steuerung");
@@ -167,13 +218,17 @@ function setup() {
   reglerZeile.class("reglerreihe");
   reglerZeile.parent(steuerung);
 
-  // Bisherige drei Regler
+  // Regler für die Wolkenanzahl
   wolkenRegler = erstelleRegler(reglerZeile, "Anzahl der Wolken", 0, 100, 30, 1);
-  wolkenSchwelle = erstelleRegler(reglerZeile, "Wolken-Empfindlichkeit", 1, 100, 50, 1);
+
+  // Gemeinsamer Regler für Wolken und Regen
+  wolkenSchwelle = erstelleRegler(reglerZeile, "Wolken- und Regenempfindlichkeit", 1, 100, 50, 1);
+
+  // Regler für die Baumbewegung
   baumSchwelle = erstelleRegler(reglerZeile, "Baum-Schwellenwert", 0, 255, 100, 1);
 
-  // Neuer Regler für die Anzahl der Hintergrundbäume
-  hintergrundRegler = erstelleRegler(reglerZeile, "Anzahl der Hintergrundbäume", 0, 8, 4, 1);
+  // Regler für die Anzahl der Hintergrundbäume
+  hintergrundRegler = erstelleRegler(reglerZeile, "Anzahl der Bäume", 0, 8, 4, 1);
 
   // Zeigt den aktuellen Status an
   statusText = createP("Status: Audio aus");
@@ -359,6 +414,15 @@ function draw() {
   // Wasser und bisherige Baumgruppen
   image(wasserBild, 0, 0, 750, 500);
   zeichneBaeume(true);
+
+  // Berechnet die Anzahl der Regentropfen anhand der Lautstärke
+  let regenAnzahl = floor(constrain(map(lautstaerke, 0, empfindlichkeit, 0, 30), 0, 30));
+
+  // Bewegt und zeichnet die Regentropfen
+  for (let i = 0; i < regenAnzahl; i++) {
+    regentropfen[i].bewegen();
+    regentropfen[i].anzeigen();
+  }
 
   // Vordergrund
   image(wiesenBild, 0, 0, 750, 500);
