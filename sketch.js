@@ -9,7 +9,7 @@ let wolkenRegler, wolkenSchwelle, baumSchwelle, hintergrundRegler;
 let startKnopf, stoppKnopf, demoKnopf, statusText;
 
 // Legt fest, welcher Modus gerade aktiv ist
-// "aus" = kein Audio, "audio" = echtes Audiosignal, "demo" = Demo-Modus
+// "aus" = kein Audio, "audio" = echtes Audiosignal, "demo" = Demo- Modus
 let modus = "aus";
 let demoZeit = 0;
 
