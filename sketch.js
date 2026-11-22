@@ -1,431 +1,310 @@
-let wolkenBild, sonnenBild, bergeBild, huegelBild, wasserBild, wiesenBild, vordergrundBild;
-let einzelBaumBild; // Bild für die neue Baumreihe
+  // Variablen (Behälter, in dem etwas gespeichert wird) für die Bilder
+  let wolkenBild, sonnenBild, bergeBild, huegelBild, wasserBild, wiesenBild, vordergrundBild, einzelBaumBild; 
 
-let mikrofon, fft, lautstaerke = 0;
-let wolken = [], baeume = [], hintergrundBaeume = [];
-let regentropfen = [];
+  // Variablen für die Audioanalyse
+  let audio; // empfängt das Audiosignal (ermöglicht die Messung der Lautstärke)
+  let fft;   // analysiert die Frequenzen des Audiosignals
 
-let wolkenRegler, wolkenSchwelle, baumSchwelle, hintergrundRegler;
-let startKnopf, stoppKnopf, demoKnopf, statusText;
+  let wolken = [], baeume = [], hintergrundBaeume = [], regentropfen = []; // erstellt 4 Arrays (Listen) in denen Objekte gespeichert werden
 
-// Legt fest, welcher Modus gerade aktiv ist
-// "aus" = kein Audio, "audio" = echtes Audiosignal, "demo" = Demo- Modus
-let modus = "aus";
-let demoZeit = 0;
+  let wolkenRegler, wolkenSchwelle, baumSchwelle, hintergrundRegler; // Variablen für die Regler
 
+  let statusText; // Variable für die Statusanzeige (zum speichern der Textelemente)
+  let modus = "aus"; // Variable für den aktuellen Modus (Startwert=aus) modi: aus, audio, demo
+  let demoZeit = 0; // Zähler für die Durchläufe von draw() im Demo-Modus, beginnt bei 0
 
-// Lädt alle Bilder vor dem Programmstart
-function preload() {
-  wolkenBild = loadImage("wolke.svg");
-  sonnenBild = loadImage("sonne.svg");
-  bergeBild = loadImage("1berge.svg");
-  huegelBild = loadImage("1huegel.svg");
-  wasserBild = loadImage("1wasser.svg");
-  wiesenBild = loadImage("1wiesen.svg");
-  vordergrundBild = loadImage("vordergrund_ohne_baeume.svg");
+  function preload() { // wird automatisch vor setup() ausgeführt
+	// lädt die Bilder und speichert sie in den Variablen
+    wolkenBild = loadImage("wolke.svg");
+    sonnenBild = loadImage("sonne.svg");
+    bergeBild = loadImage("1berge.svg");
+    huegelBild = loadImage("1huegel.svg");
+    wasserBild = loadImage("1wasser.svg");
+    wiesenBild = loadImage("1wiesen.svg");
+    vordergrundBild = loadImage("vordergrund_ohne_baeume.svg");
+    einzelBaumBild = loadImage("baum_einzeln.svg");
 
-  // Lädt das Bild für die neue Baumreihe
-  einzelBaumBild = loadImage("baum_einzeln.svg");
+    baeume = [ // neue Objekte werden im Array gespeichert
+	  // neues Objekt "Baum"("Bilddatei"), für die Ebenen: Vordergrund (false) / Hintergrund (true), x-Position, y-Position, untere Frequenzgrenze (in Hz), obere Frequenzgrenze (in Hz), Bewegeungsgeschwindigkeit 
+      new Baum("baum_hinten_1.svg", true, 39, 235, 60, 180, 0.35),
+      new Baum("baum_hinten_2.svg", true, 735, 220, 180, 350, 0.29),
+      new Baum("baum_vorne_1.svg", false, 639, 330, 350, 700, 0.23),
+      new Baum("baum_vorne_2.svg", false, 660, 495, 700, 1300, 0.17),
+      new Baum("baum_vorne_3.svg", false, 119, 265, 1300, 2600, 0.12),
+      new Baum("baum_vorne_4.svg", false, 125, 495, 2600, 5000, 0.08)];
 
-  // Erstellt die bisherigen sechs Baumgruppen
-  // Jede Baumgruppe reagiert auf einen eigenen Frequenzbereich
-  baeume = [
-    new Baum("baum_hinten_1.svg", true, 39, 235, 60, 180, 0.35),
-    new Baum("baum_hinten_2.svg", true, 735, 220, 180, 350, 0.29),
-    new Baum("baum_vorne_1.svg", false, 639, 330, 350, 700, 0.23),
-    new Baum("baum_vorne_2.svg", false, 660, 495, 700, 1300, 0.17),
-    new Baum("baum_vorne_3.svg", false, 119, 265, 1300, 2600, 0.12),
-    new Baum("baum_vorne_4.svg", false, 125, 495, 2600, 5000, 0.08)
-  ];
-
-  // Erstellt acht zusätzliche Bäume hinter der Wasserfläche
-  // Jeder Baum bekommt eine eigene Position und einen Frequenzbereich
-  hintergrundBaeume = [
-    new Baum(einzelBaumBild, true, 80, 255, 60, 150, 0.35, true),
-    new Baum(einzelBaumBild, true, 165, 253, 150, 300, 0.31, true),
-    new Baum(einzelBaumBild, true, 250, 253, 300, 500, 0.27, true),
-    new Baum(einzelBaumBild, true, 335, 255, 500, 800, 0.23, true),
-    new Baum(einzelBaumBild, true, 420, 250, 800, 1200, 0.19, true),
-    new Baum(einzelBaumBild, true, 505, 247, 1200, 2000, 0.15, true),
-    new Baum(einzelBaumBild, true, 590, 250, 2000, 3200, 0.11, true),
-    new Baum(einzelBaumBild, true, 675, 252, 3200, 5000, 0.08, true)
-  ];
-}
-
-
-// Erstellung einer Klasse für alle Wolken
-class Wolke {
-
-  // Legt die Anfangswerte einer Wolke fest
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.geschwindigkeit = random(0.5, 2);
+    hintergrundBaeume = [ // neue Objekte werden im Array gespeichert 
+	  // neues Objekt "Baum" (Variable, in der die Bilddatei gespeichert ist), für die Ebenen: Hintergrund (true), x-Position, y-Position, untere Frequenzgrenze (in Hz), obere Frequenzgrenze (in Hz), Bewegeungsgeschwindigkeit, true = einzeln (einzelner Baum)
+      new Baum(einzelBaumBild, true, 80, 255, 60, 150, 0.35, true),
+      new Baum(einzelBaumBild, true, 165, 253, 150, 300, 0.31, true),
+      new Baum(einzelBaumBild, true, 250, 253, 300, 500, 0.27, true),
+      new Baum(einzelBaumBild, true, 335, 255, 500, 800, 0.23, true),
+      new Baum(einzelBaumBild, true, 420, 250, 800, 1200, 0.19, true),
+      new Baum(einzelBaumBild, true, 505, 247, 1200, 2000, 0.15, true),
+      new Baum(einzelBaumBild, true, 590, 250, 2000, 3200, 0.11, true),
+      new Baum(einzelBaumBild, true, 675, 252, 3200, 5000, 0.08, true)];
   }
 
-  // Methode zum Bewegen der Wolke
-  bewegen() {
-    this.x += this.geschwindigkeit;
+  class Wolke { // Klasse (Bauplan) für die Wolken
 
-    // Setzt die Wolke wieder an den linken Rand
-    if (this.x > width) {
-      this.x = -100;
-      this.y = random(0, 100);
-      this.geschwindigkeit = random(0.5, 2);
-    }
+    constructor(x, y) { // Llegt Eigenschaften fest: Position (x, y), automatisch ausgeführt wenn man neue Wolke (mit new Wolke) erstellt 
+      this.x = x; // speichert übergebenen x- Wert in der Eigenschaft .x des jeweiligen Wolkenobjekts (this)
+      this.y = y; // speichert übergebenen y- Wert in der Eigenschaft .y des jeweiligen Wolkenobjekts (this)
+      this.geschwindigkeit = random(0.25, 3);} // // speichert zufällige Geschwindigkeit zwischen 0,25-3 in der Eigenschaft .geschwindigkeit des jeweiligen Wolkenobjekts (this)
+
+    bewegen() { // Methode zum Bewegen der Wolke
+      this.x = this.x + this.geschwindigkeit; // addiert die Geschwindigkeit zur bisherigen x-Position, speichert den neuen x- Wert in der Eigenschaft .x des jeweiligen Wolkenobjekts (this)
+
+      if (this.x > width) { // "Wenn" die x-Position größer als die Breite der Zeichenfläche (750 px) ist...
+        this.x = -100; // ...dann wird das Wolkenobjekt links außerhalb der Zeichenfläche positioniert (Wolke hat ist 100px breit)
+        this.y = random(-50, 100); // ...dann bekommt das Wolkenobjekt eine neue zufällige Höhe zwischen -50-100px (-50 für abgeschnittene Wolken oben)
+        this.geschwindigkeit = random(0.25, 3);}} // ...dann bekommt das Wolkenobjekt eine neue zufällige Geschwindigkeit zwischen 0.25-3
+
+    anzeigen() { // Methode, die die Wolken auf die Zeichenfläche auf auktueller Position zeichnet
+      image(wolkenBild, this.x, this.y, 100, 60);} // Bilddatei, x-Position, y-Position, Breite der Wolke (in px), Höhe der Wolke (in px)
   }
 
-  // Methode zum Anzeigen der Wolke
-  anzeigen() {
-    image(wolkenBild, this.x, this.y, 100, 60);
-  }
-}
+  class Baum { // Klasse (Bauplan) für die Bäume
+    // Legt EIngeschaften fest, automatisch ausgeführt wenn man neuen Baum (mit new Baum) erstellt 
+    constructor(bild, hinten, x, y, tief, hoch, tempo, einzeln = false) { // (Bilddatei, hinten = true (hintere Ebene) x, y, untere Frequenzgrenze (in Hz)), obere Frequenzgrenze (in Hz), Bewegungsgeschwindigkeit, einzeln = false (keine einzelnen Bäume)
+    if (einzeln) { // "Wenn" einzeln = true (Einzelbaum)
+  		this.bild = bild;} // ...dann wird das bereits geladene Bild verwendet, speichert Bild in der Eigeschaft .bild
+	else {
+  		this.bild = loadImage(bild);} // ...sonst wird das 
+      this.hinten = hinten;
+      this.x = x;
+      this.y = y;
+      this.tief = tief;
+      this.hoch = hoch;
+      this.tempo = tempo;
+      this.einzeln = einzeln;
+      this.winkel = 0;}
 
+    bewegen(nummer) {
+      let energie = baumEnergie(this, nummer);
+      let zielWinkel = 0;
 
-// Erstellung einer Klasse für alle Bäume
-class Baum {
+      if (energie > baumSchwelle.value()) {
+        zielWinkel = sin(frameCount * this.tempo) * 0.035;}
 
-  // Legt die Anfangswerte eines Baumes fest
-  constructor(bild, hinten, x, y, tief, hoch, tempo, einzeln = false) {
-    // Lädt die bisherigen SVG-Dateien oder verwendet das bereits geladene Einzelbild
-    this.bild = einzeln ? bild : loadImage(bild);
-    this.hinten = hinten;
-    this.x = x;
-    this.y = y;
-    this.tief = tief;
-    this.hoch = hoch;
-    this.tempo = tempo;
-    this.winkel = 0;
-    this.einzeln = einzeln;
-  }
+      this.winkel = lerp(this.winkel, zielWinkel, 0.2);}
 
-  // Methode zum Bewegen des Baumes
-  bewegen(nummer) {
-    let energie = baumEnergie(this, nummer);
-    let zielWinkel = 0;
+    anzeigen() {
+      push();
+      translate(this.x, this.y);
+      rotate(this.winkel);
 
-    // Der Baum wackelt, wenn genügend Energie vorhanden ist
-    if (energie > baumSchwelle.value()) {
-      zielWinkel = sin(frameCount * this.tempo) * 0.035;
-    }
+      if (this.einzeln) {
+        image(this.bild, -35, -75, 70, 75);}
+      else {
+        image(this.bild, -this.x, -this.y, 750, 500);}
 
-    // Sorgt für eine weiche Bewegung
-    this.winkel = lerp(this.winkel, zielWinkel, 0.2);
-  }
-
-  // Methode zum Anzeigen des Baumes
-  anzeigen() {
-    push();
-    translate(this.x, this.y);
-    rotate(this.winkel);
-
-    if (this.einzeln) {
-      // Zeichnet den einzelnen Baum mit dem Drehpunkt unten am Stamm
-      image(this.bild, -35, -75, 70, 75);
-    } else {
-      // Zeichnet die bisherigen Baumgruppen
-      image(this.bild, -this.x, -this.y, 750, 500);
-    }
-
-    pop();
-  }
-}
-
-
-// Erstellung einer Klasse für alle Regentropfen
-class Regentropfen {
-
-  constructor() {
-    this.x = random(0, 750);
-    this.y = random(50, 100);
-    this.zielY = random(270, 400);
-    this.kreis = 0;
+      pop();}
   }
 
-  bewegen() {
-    // Regentropfen fällt nach unten
-    if (this.y < this.zielY) {
-      this.y += 10;
-    } else {
-      // Kreis wird größer
-      this.kreis += 0.5;
-    }
+  class Regentropfen {
 
-    // Regentropfen startet erneut
-    if (this.kreis > 40) {
+    constructor() {
+      this.zielY = random(270, 400);
+      this.zuruecksetzen();}
+
+    zuruecksetzen() {
       this.x = random(0, 750);
       this.y = random(50, 100);
-      this.kreis = 0;
-    }
-  }
+      this.kreis = 0;}
 
-  anzeigen() {
-    push();
+    bewegen() {
+      if (this.y < this.zielY) {
+        this.y += 10;}
+      else {
+        this.kreis += 0.5;}
 
-    if (this.y < this.zielY) {
-      // Regentropfen zeichnen
-      stroke(200, 230, 255);
-      line(this.x, this.y - 10, this.x, this.y);
-    } else {
-      // Kreis zeichnen und ausblenden
-      noFill();
-      stroke(255, 255, 255, 255 - this.kreis * 6);
-      ellipse(this.x, this.zielY, this.kreis, this.kreis / 3);
+      if (this.kreis > 40) {
+        this.zuruecksetzen();}
     }
 
-    pop();
-  }
-}
+    anzeigen() {
+      push();
 
+      if (this.y < this.zielY) {
+        stroke(200, 230, 255);
+        line(this.x, this.y - 10, this.x, this.y);}
+      else {
+        noFill();
+        stroke(255, 255, 255, 255 - this.kreis * 6);
+        ellipse(this.x, this.zielY, this.kreis, this.kreis / 3);}
 
-// Wird einmal beim Start des Programms ausgeführt
-function setup() {
-  let zeichenflaeche = createCanvas(750, 500);
-  zeichenflaeche.parent("zeichenflaeche");
-
-  // Erstellt 100 Wolken mit zufälligen Positionen
-  for (let i = 0; i < 100; i++) {
-    wolken.push(new Wolke(random(-100, 800), random(0, 100)));
-  }
-
-  // Erstellt 30 Regentropfen
-  for (let i = 0; i < 30; i++) {
-    regentropfen.push(new Regentropfen());
+      pop();}
   }
 
-  let steuerung = select("#steuerung");
-  let knoepfe = createDiv();
-  knoepfe.class("knopfreihe");
-  knoepfe.parent(steuerung);
+  function setup() {
+    createCanvas(750, 500).parent("zeichenflaeche");
 
-  // Button zum Starten des Audiosignals
-  startKnopf = createButton("Audio starten");
-  startKnopf.parent(knoepfe);
-  startKnopf.mousePressed(starteMikrofon);
+    for (let i = 0; i < 100; i++) {
+      wolken.push(new Wolke(random(-100, 800), random(0, 100)));}
 
-  // Button zum Stoppen
-  stoppKnopf = createButton("Audio / Demo stoppen");
-  stoppKnopf.parent(knoepfe);
-  stoppKnopf.mousePressed(stoppeAlles);
+    for (let i = 0; i < 30; i++) {
+      regentropfen.push(new Regentropfen());}
 
-  // Button für den Demo-Modus
-  demoKnopf = createButton("Demo-Modus starten");
-  demoKnopf.parent(knoepfe);
-  demoKnopf.mousePressed(starteDemo);
+    let knoepfe = createDiv();
+    knoepfe.class("knopfreihe");
+    knoepfe.parent("steuerung");
 
-  // Erstellt den Bereich für die Regler
-  let reglerZeile = createDiv();
-  reglerZeile.class("reglerreihe");
-  reglerZeile.parent(steuerung);
+    erstelleKnopf(knoepfe, "Audio starten", starteAudio);
+    erstelleKnopf(knoepfe, "Audio / Demo stoppen", stoppeAlles);
+    erstelleKnopf(knoepfe, "Demo-Modus starten", starteDemo);
 
-  // Regler für die Wolkenanzahl
-  wolkenRegler = erstelleRegler(reglerZeile, "Anzahl der Wolken", 0, 100, 30, 1);
+    let reglerZeile = createDiv();
+    reglerZeile.class("reglerreihe");
+    reglerZeile.parent("steuerung");
 
-  // Gemeinsamer Regler für Wolken und Regen
-  wolkenSchwelle = erstelleRegler(reglerZeile, "Wolken- und Regenempfindlichkeit", 1, 100, 50, 1);
+    wolkenRegler = erstelleRegler(reglerZeile, "Anzahl der Wolken", 0, 100, 30);
+    wolkenSchwelle = erstelleRegler(reglerZeile, "Wolken- und Regenempfindlichkeit", 1, 100, 50);
+    baumSchwelle = erstelleRegler(reglerZeile, "Baum-Schwellenwert", 0, 255, 100);
+    hintergrundRegler = erstelleRegler(reglerZeile, "Anzahl der Bäume", 0, 8, 4);
 
-  // Regler für die Baumbewegung
-  baumSchwelle = erstelleRegler(reglerZeile, "Baum-Schwellenwert", 0, 255, 100, 1);
+    statusText = createP("Status: Audio aus");
+    statusText.id("status");
+    statusText.parent("steuerung");
+  }
 
-  // Regler für die Anzahl der Hintergrundbäume
-  hintergrundRegler = erstelleRegler(reglerZeile, "Anzahl der Bäume", 0, 8, 4, 1);
+  function erstelleKnopf(eltern, name, funktion) {
+    let knopf = createButton(name);
+    knopf.parent(eltern);
+    knopf.mousePressed(funktion);}
 
-  // Zeigt den aktuellen Status an
-  statusText = createP("Status: Audio aus");
-  statusText.id("status");
-  statusText.parent(steuerung);
-}
+  function erstelleRegler(eltern, name, min, max, wert) {
+    let gruppe = createDiv();
+    gruppe.class("reglergruppe");
+    gruppe.parent(eltern);
 
+    let beschriftung = createSpan(name + ": " + wert);
+    beschriftung.parent(gruppe);
 
-// Erstellt einen Regler mit einer Beschriftung
-function erstelleRegler(eltern, name, min, max, wert, schritt) {
-  let gruppe = createDiv();
-  gruppe.class("reglergruppe");
-  gruppe.parent(eltern);
+    let regler = createSlider(min, max, wert, 1);
+    regler.parent(gruppe);
 
-  let beschriftung = createSpan(name + ": " + wert);
-  beschriftung.parent(gruppe);
+    regler.input(() => beschriftung.html(name + ": " + regler.value()));
 
-  let regler = createSlider(min, max, wert, schritt);
-  regler.parent(gruppe);
+    return regler;
+  }
 
-  // Aktualisiert die Beschriftung beim Bewegen des Reglers
-  regler.input(() => beschriftung.html(name + ": " + regler.value()));
+  async function starteAudio() {
+    stoppeAlles();
+    statusText.html("Status: Audio wird gestartet...");
 
-  return regler;
-}
+    let neuesAudio = new p5.AudioIn();
+    audio = neuesAudio;
 
+    try {
+      await userStartAudio();
 
-// Startet den Audioeingang des Computers
-async function starteMikrofon() {
-  stoppeAlles();
-  statusText.html("Status: Audio wird gestartet...");
+      if (audio !== neuesAudio) return;
 
-  try {
-    // Fordert die Erlaubnis für den Audiozugriff an
-    await userStartAudio();
+      neuesAudio.start(() => {
+        if (audio !== neuesAudio) {
+          neuesAudio.stop();
+          return;}
 
-    let neuesMikrofon = new p5.AudioIn();
-    mikrofon = neuesMikrofon;
+        fft = new p5.FFT(0.8, 1024);
+        fft.setInput(audio);
 
-    neuesMikrofon.start(() => {
+        modus = "audio";
+        statusText.html("Status: Audio aktiv – Synthesizer spielen");}, audioFehler);}
+    catch (fehler) {audioFehler(fehler);}
 
-      // Prüft, ob dieser Audioeingang noch verwendet werden soll
-      if (mikrofon !== neuesMikrofon) {
-        neuesMikrofon.stop();
-        return;
-      }
+    function audioFehler(fehler) {
+      if (audio !== neuesAudio) return;
 
-      // Erstellt die Frequenzanalyse
-      fft = new p5.FFT(0.8, 1024);
-      fft.setInput(mikrofon);
+      stoppeAlles();
+      statusText.html("Fehler: Audioeingang nicht verfügbar.");
+      console.error(fehler);}
+  }
 
-      modus = "audio";
-      statusText.html("Status: Audio aktiv – Synthesizer spielen");
-    },
+  function stoppeAlles() {
+    if (audio) audio.stop();
 
-    // Wird bei einem Fehler ausgeführt
-    (fehler) => {
-      if (mikrofon !== neuesMikrofon) return;
-
-      mikrofon = undefined;
-      fft = undefined;
-      modus = "aus";
-
-      statusText.html("Fehler: Audioeingang nicht verfügbar oder Zugriff verweigert.");
-      console.error(fehler);
-    });
-
-  } catch (fehler) {
+    audio = undefined;
+    fft = undefined;
     modus = "aus";
-    statusText.html("Fehler: Audio konnte nicht gestartet werden.");
-    console.error(fehler);
-  }
-}
 
-
-// Stoppt Audio und Demo
-function stoppeAlles() {
-  modus = "aus";
-  fft = undefined;
-
-  if (mikrofon) mikrofon.stop();
-
-  mikrofon = undefined;
-  lautstaerke = 0;
-
-  if (statusText) {
     statusText.html("Status: Audio und Demo gestoppt");
   }
-}
 
+  function starteDemo() {
+    stoppeAlles();
+    demoZeit = 0;
+    modus = "demo";
 
-// Startet den Demo-Modus ohne Mikrofon
-function starteDemo() {
-  stoppeAlles();
-  demoZeit = 0;
-  modus = "demo";
-
-  statusText.html("Status: Demo-Modus aktiv (ohne Mikrofon)");
-}
-
-
-// Bestimmt die Energie im Frequenzbereich eines Baumes
-function baumEnergie(baum, nummer) {
-
-  // Misst die echte Energie im Audio-Modus
-  if (modus === "audio" && fft) {
-    return fft.getEnergy(baum.tief, baum.hoch);
+    statusText.html("Status: Demo-Modus aktiv (ohne Audiosignal)");
   }
 
-  // Erzeugt künstliche Energie im Demo-Modus
-  if (modus === "demo") {
-    let phase = (demoZeit / 55 + nummer * 0.85) % 6;
+  function baumEnergie(baum, nummer) {
+    if (modus === "audio" && fft) {
+      return fft.getEnergy(baum.tief, baum.hoch);}
 
-    return phase < 1.5 ? 190 : 0;
+    if (modus === "demo") {
+      let phase = (demoZeit / 55 + nummer * 0.85) % 6;
+      return phase < 1.5 ? 190 : 0;}
+
+    return 0;
   }
 
-  return 0;
-}
-
-
-// Zeichnet die bisherigen Bäume
-function zeichneBaeume(hinten) {
-  for (let i = 0; i < baeume.length; i++) {
-    if (baeume[i].hinten === hinten) {
-      baeume[i].bewegen(i);
-      baeume[i].anzeigen();
-    }
-  }
-}
-
-
-// Zeichnet die neue Baumreihe hinter der Wasserfläche
-function zeichneHintergrundBaeume() {
-  for (let i = 0; i < hintergrundRegler.value(); i++) {
-    hintergrundBaeume[i].bewegen(i + baeume.length);
-    hintergrundBaeume[i].anzeigen();
-  }
-}
-
-
-// Wird ständig wiederholt (ca. 60-mal pro Sekunde)
-function draw() {
-  background(135, 206, 235);
-  lautstaerke = 0;
-
-  // Misst die Lautstärke und analysiert die Frequenzen
-  if (modus === "audio" && mikrofon && mikrofon.enabled) {
-    lautstaerke = mikrofon.getLevel();
-
-    if (fft) fft.analyze();
+  function zeichneBaeume(hinten) {
+    for (let i = 0; i < baeume.length; i++) {
+      if (baeume[i].hinten === hinten) {
+        baeume[i].bewegen(i);
+        baeume[i].anzeigen();}}
   }
 
-  // Erzeugt eine künstliche Lautstärke im Demo-Modus
-  if (modus === "demo") {
-    demoZeit++;
-    lautstaerke = (sin(demoZeit * 0.06) + 1) * 0.07;
+  function zeichneHintergrundBaeume() {
+    for (let i = 0; i < hintergrundRegler.value(); i++) {
+      hintergrundBaeume[i].bewegen(i + baeume.length);
+      hintergrundBaeume[i].anzeigen();}
   }
 
-  // Zeichnet die Sonne
-  image(sonnenBild, 50, 30, 120, 120);
+  function draw() {
+    background(135, 206, 235);
 
-  // Berechnet die Empfindlichkeit und Helligkeit der Wolken
-  let empfindlichkeit = map(wolkenSchwelle.value(), 1, 100, 0.3, 0.03);
-  let helligkeit = constrain(map(lautstaerke, 0, empfindlichkeit, 255, 60), 60, 255);
+    let lautstaerke = 0;
 
-  tint(helligkeit);
+    if (modus === "audio" && audio && audio.enabled) {
+      lautstaerke = audio.getLevel();
+      fft.analyze();}
 
-  // Bewegt und zeichnet die Wolken
-  for (let i = 0; i < wolkenRegler.value(); i++) {
-    wolken[i].bewegen();
-    wolken[i].anzeigen();
+    if (modus === "demo") {
+      demoZeit++;
+      lautstaerke = (sin(demoZeit * 0.06) + 1) * 0.07;}
+
+    let empfindlichkeit = map(wolkenSchwelle.value(), 1, 100, 0.3, 0.03);
+    let wetterStaerke = constrain(lautstaerke / empfindlichkeit, 0, 1);
+
+    image(sonnenBild, 50, 30, 120, 120);
+
+    let helligkeit = map(wetterStaerke, 0, 1, 255, 60);
+    tint(helligkeit);
+
+    for (let i = 0; i < wolkenRegler.value(); i++) {
+      wolken[i].bewegen();
+      wolken[i].anzeigen();}
+
+    noTint();
+
+    image(bergeBild, 0, 0, 750, 500);
+    image(huegelBild, 0, 0, 750, 500);
+
+    zeichneHintergrundBaeume();
+
+    image(wasserBild, 0, 0, 750, 500);
+    zeichneBaeume(true);
+
+    let regenAnzahl = floor(wetterStaerke * regentropfen.length);
+
+    for (let i = 0; i < regenAnzahl; i++) {
+      regentropfen[i].bewegen();
+      regentropfen[i].anzeigen();}
+
+    image(wiesenBild, 0, 0, 750, 500);
+    image(vordergrundBild, 0, 0, 750, 500);
+    zeichneBaeume(false);
   }
-
-  noTint();
-
-  // Zeichnet die Landschaft in der richtigen Reihenfolge
-  image(bergeBild, 0, 0, 750, 500);
-  image(huegelBild, 0, 0, 750, 500);
-
-  // Neue Baumreihe hinter dem Wasser
-  zeichneHintergrundBaeume();
-
-  // Wasser und bisherige Baumgruppen
-  image(wasserBild, 0, 0, 750, 500);
-  zeichneBaeume(true);
-
-  // Berechnet die Anzahl der Regentropfen anhand der Lautstärke
-  let regenAnzahl = floor(constrain(map(lautstaerke, 0, empfindlichkeit, 0, 30), 0, 30));
-
-  // Bewegt und zeichnet die Regentropfen
-  for (let i = 0; i < regenAnzahl; i++) {
-    regentropfen[i].bewegen();
-    regentropfen[i].anzeigen();
-  }
-
-  // Vordergrund
-  image(wiesenBild, 0, 0, 750, 500);
-  image(vordergrundBild, 0, 0, 750, 500);
-  zeichneBaeume(false);
-}
