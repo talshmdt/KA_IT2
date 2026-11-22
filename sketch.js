@@ -131,41 +131,42 @@
         line(this.x, this.y - 10, this.x, this.y);} // zeichnet die Linie eines Tropfens (Anfang: x-Position, y-Position - 10, Ende: x-Position, y-Position)
       else {
         noFill(); // Sonst: keine Füllfarbe
-        stroke(255, 255, 255, 255 - this.kreis * 6); // Farbe (R,G,B)= weiß, Deckkraft 255 (voll sichtbar) - Kreisgröße * 6 (Kreisgröße 40 = Deckkraft 15 (fast unsichtbar))
+        stroke(255, 255, 255, 255 - this.kreis * 6); // Farbe (R,G,B)= weiß, Deckkraft 255 (voll sichtbar) - Kreisgröße * 6 (Kreisgröße 40 = Deckkraft 15 (fast unsichtbar) -> je größer der Kreis wird desto transparenter wird er)
         ellipse(this.x, this.zielY, this.kreis, this.kreis / 3);} // zeichnet eine Ellipse (x-Position, y-Zielposition, Höhe der Ellipse: Kreisgröße/3 -> flach)
 
       pop();} // Stellt die ursprünglichen Zeicheneinstellungen wieder her () (von push()) -> damit es nur für den aktuellen Tropfen gilt
   }
+  // Funktion setup wird nur einmal am Anfang asugeführt (bereitet Programm beim Start vor)
+  function setup() { // Funktion erstellt Zeichenfläche (bereitet 100 Wolken und 30 Regentropfen vor)
+    createCanvas(750, 500).parent("zeichenflaeche"); // erstellt Zeichenfläche 750x500px, .parent("") legt die Stelle fest, wo diese eingefügt wird (HTML-Code: ID zeichenflaeche)
+	  
+	// Beide For-Schleifen erstellt nur die Objekte (Wolken und Regentropfen). Wie viele davon tatsächlich angezeigt werden, bestimmt später der Wolken-Schieberegler in draw()
+    for (let i = 0; i < 100; i = i + 1) { // For-Schleife: Zähler beginnt bei 0, Schleife läuft solange i kleiner als 100 ist, nach jedem Durchlauf wird i um 1 erhöht
+      wolken.push(new Wolke(random(-100, 800), random(-50, 100)));} // erstellt neues Wolkenobjekt und fügt es dem Array wolken hinzu (push), mit zufälliger x-Position zwischen -100 und 800 (damit Wolken aus dem Bild kommen und ziehen können), zufälliger y-Position zwischen -50 und 100 (-50 damit Wolken oben halb zu sehen sein können)
 
-  function setup() {
-    createCanvas(750, 500).parent("zeichenflaeche");
+    for (let i = 0; i < 30; i = i + 1) { // For-Schleife: Zähler beginnt bei 0, Schleife läuft solange i kleiner als 30 ist, nach jedem Durchlauf wird i um 1 erhöht
+      regentropfen.push(new Regentropfen());} // erstellt neues Tropfennobjekt und fügt es dem Array regentropfen hinzu (push)
 
-    for (let i = 0; i < 100; i++) {
-      wolken.push(new Wolke(random(-100, 800), random(0, 100)));}
+    let knoepfe = createDiv(); // Erstellt neue Variable knoefe und HTML-Element div (Container)
+    knoepfe.class("knopfreihe"); // die Variable knoepfe wird der CSS-Klasse knopfreihe zugewiesen
+    knoepfe.parent("steuerung"); // legt die Stelle fest, wo der Inhalt der Variable knoepfe eingefügt wird (HTML-Code: ID steuerung)
 
-    for (let i = 0; i < 30; i++) {
-      regentropfen.push(new Regentropfen());}
+    erstelleKnopf(knoepfe, "Audio starten", starteAudio); // erstellt Button, zugewiesene Variable, Text, auszuführende Funktion
+    erstelleKnopf(knoepfe, "Audio / Demo stoppen", stoppeAlles); // erstellt Button, zugewiesene Variable, Text, auszuführende Funktion
+    erstelleKnopf(knoepfe, "Demo-Modus starten", starteDemo); // erstellt Button, zugewiesene Variable, Text, auszuführende Funktion
 
-    let knoepfe = createDiv();
-    knoepfe.class("knopfreihe");
-    knoepfe.parent("steuerung");
+    let reglerZeile = createDiv(); // Erstellt neue Variable reglerZeile und HTML-Element div (Container)
+    reglerZeile.class("reglerreihe"); // die Variable reglerZeile wird der CSS-Klasse reglerreihe zugewiesen
+    reglerZeile.parent("steuerung"); // legt die Stelle fest, wo der Inhalt der Variable reglerZeile eingefügt wird (HTML-Code: ID steuerung)
 
-    erstelleKnopf(knoepfe, "Audio starten", starteAudio);
-    erstelleKnopf(knoepfe, "Audio / Demo stoppen", stoppeAlles);
-    erstelleKnopf(knoepfe, "Demo-Modus starten", starteDemo);
+    wolkenRegler = erstelleRegler(reglerZeile, "Anzahl der Wolken", 0, 100, 50); // ruft Funktion erstelleRegler auf: div-Container reglerZeile in dem der Regler erstellt wird, Text, Minimalwert 0, Maximalwert 100, Startwert 50 -> Rückgabe der Funktion in Variable wolkenRegler gespeichert
+    wolkenSchwelle = erstelleRegler(reglerZeile, "Wolken- und Regenempfindlichkeit", 1, 100, 50); // ruft Funktion erstelleRegler auf: div-Container reglerZeile in dem der Regler erstellt wird, Text, Minimalwert 1, Maximalwert 100, Startwert 50 -> Rückgabe der Funktion in Variable wolkenSchwelle gespeichert
+    baumSchwelle = erstelleRegler(reglerZeile, "Baum-Schwellenwert", 0, 255, 100); // ruft Funktion erstelleRegler auf: div-Container reglerZeile in dem der Regler erstellt wird, Text, Minimalwert 0, Maximalwert 255 (maximaler Energiewert bei fft), Startwert 100 -> Rückgabe der Funktion in Variable baumSchwelle gespeichert
+    hintergrundRegler = erstelleRegler(reglerZeile, "Anzahl der Bäume", 0, 8, 4); // ruft Funktion erstelleRegler auf: div-Container reglerZeile in dem der Regler erstellt wird, Text, Minimalwert 0, Maximalwert 8, Startwert 4 -> Rückgabe der Funktion in Variable hintergrundRegler gespeichert
 
-    let reglerZeile = createDiv();
-    reglerZeile.class("reglerreihe");
-    reglerZeile.parent("steuerung");
-
-    wolkenRegler = erstelleRegler(reglerZeile, "Anzahl der Wolken", 0, 100, 30);
-    wolkenSchwelle = erstelleRegler(reglerZeile, "Wolken- und Regenempfindlichkeit", 1, 100, 50);
-    baumSchwelle = erstelleRegler(reglerZeile, "Baum-Schwellenwert", 0, 255, 100);
-    hintergrundRegler = erstelleRegler(reglerZeile, "Anzahl der Bäume", 0, 8, 4);
-
-    statusText = createP("Status: Audio aus");
-    statusText.id("status");
-    statusText.parent("steuerung");
+    statusText = createP("Status: Audio aus"); // erstellt HTML-Absatzelement (<p>), Text -> gespeichert in Variable statusText
+    statusText.id("status"); // gibt dem HTML-Absatzelement (<p>) die HTML-ID status (in CSS .status)
+    statusText.parent("steuerung"); // legt die Stelle fest, wo der Inhalt der Variable reglerZeile eingefügt wird (HTML-Code: ID steuerung) --> Bereich steuerung enthält Buttons, Regler und Statusanzeige
   }
 
   function erstelleKnopf(eltern, name, funktion) {
