@@ -67,74 +67,74 @@
   class Baum { // Klasse (Bauplan) für die Bäume
     // Legt EIngeschaften fest, automatisch ausgeführt wenn man neuen Baum (mit new Baum) erstellt 
     constructor(bild, hinten, x, y, tief, hoch, tempo, einzeln = false) { // (Bilddatei, hinten = true (hintere Ebene) x, y, untere Frequenzgrenze (in Hz)), obere Frequenzgrenze (in Hz), Bewegungsgeschwindigkeit, einzeln = false (keine einzelnen Bäume)
-    if (einzeln) { // "Wenn" einzeln = true (Einzelbaum)
-  		this.bild = bild;} // ...dann wird das bereits geladene Bild verwendet, speichert Bild in der Eigeschaft .bild
-	else {
-  		this.bild = loadImage(bild);} // ...sonst wird das 
-      this.hinten = hinten;
-      this.x = x;
-      this.y = y;
-      this.tief = tief;
-      this.hoch = hoch;
-      this.tempo = tempo;
-      this.einzeln = einzeln;
-      this.winkel = 0;}
+    if (einzeln) { // Wenn einzeln = true (Einzelbaum)...
+		this.bild = bild;} // ...wird das bereits geladene Bild in der Eigenschaft .bild gespeichert
+    else { // Sonst (einzeln = false, also Baumgruppe)...
+		this.bild = loadImage(bild);} // ...lädt die Bilddatei und speichert sie in der Eigenschaft.bild
 
-    bewegen(nummer) {
-      let energie = baumEnergie(this, nummer);
-      let zielWinkel = 0;
+	this.hinten = hinten; // Speichert die Ebene (true = hinten, false = vorne)
+	this.x = x; // Speichert die x-Position
+	this.y = y; // Speichert die y-Position
+	this.tief = tief; // Speichert die untere Frequenzgrenze (Hz)
+	this.hoch = hoch; // Speichert die obere Frequenzgrenze (Hz)
+	this.tempo = tempo; // Speichert die Geschwindigkeit von der Schwingung
+	this.einzeln = einzeln; // Speichert, ob es ein Einzelbaum (true) oder eine Baumgruppe (false) ist
+	this.winkel = 0;} // Legt den Anfangswinkel auf 0 fest (Baum ist nicht gedreht)
 
-      if (energie > baumSchwelle.value()) {
-        zielWinkel = sin(frameCount * this.tempo) * 0.035;}
+    bewegen(nummer) { // Methode, die den Baum bewegt, Parameter nummer bekommt beim Aufruf die Nummer/Index des Baumes
+      let energie = baumEnergie(this, nummer); // erstellt Variable, übergibt aktuelles Baumobjekt + Nummer an Funktion baumEnergie -> Rückgabewert der Funktion in energie gespeichert
+      let zielWinkel = 0; // erstellt Variable, Startwert 0 = Baum steht gerade (Winkel, den der Baum erreichen soll)
 
-      this.winkel = lerp(this.winkel, zielWinkel, 0.2);}
+      if (energie > baumSchwelle.value()) { // Wenn Energie (Signalstärke im Frequenzbereich) größer als aktueller Wert des Reglers ist...
+        zielWinkel = sin(frameCount * this.tempo) * 0.05;} // ...wackelt der Baum, frameCount = fortlaufender Zähler, this.tempo = Geschwindigkeit der Schwingung, sin() = Sinuslurve erzeugt die Schwingung (-+, hin, her), 0.035 = maximale Neigung von ungefähr 3 Grad
 
-    anzeigen() {
-      push();
-      translate(this.x, this.y);
-      rotate(this.winkel);
+      this.winkel = lerp(this.winkel, zielWinkel, 0.2);} // Berechnet einen weichen ( durch lerp) Übergang vom aktuellen Winkel zum Zielwinkel, 0,2 = 20 % Annäherung pro Aufruf
 
-      if (this.einzeln) {
-        image(this.bild, -35, -75, 70, 75);}
+    anzeigen() { // Methode zeichnet die Bäume an (mit Position und Bewegung)
+      push(); // speichert die aktuellen Zeicheneinstellungen
+      translate(this.x, this.y); // verschiebt Ursprung des Koordinatensystems (Drehpunkt) von 0,0 auf aktuelle this.x, ,this.y- Werte des Baumes
+      rotate(this.winkel); // Baum dreht sich um den neuen Ursprung, mit vorher berechnetem Winkel
+
+      if (this.einzeln) { // Wenn einzeln = true (Einzelbaum)...
+        image(this.bild, -35, -75, 70, 75);} // ...dann wird der Baum gezeichnet (Bilddatei, 35 Pixel links vom verschobenen Ursprung, 75px oberhalb des verschobenen Ursprungs, Bildbreite 70px, Bildhöhe 75px-> untere Bildmitte liegt auf dem verschobenen Urprung
       else {
-        image(this.bild, -this.x, -this.y, 750, 500);}
+        image(this.bild, -this.x, -this.y, 750, 500);} // Sonst: werden die Baumgruppen gezeichnet (Ursprung geht wieder zu den alten Werten), Bildbreite 750px, Bildhöhe 500px
 
-      pop();}
+      pop();} // Stellt die ursprünglichen Zeicheneinstellungen wieder her (von push()) -> damit es nur für den aktuellen Baum gilt
   }
 
-  class Regentropfen {
+  class Regentropfen { // Klasse für Regentropfen und Kreise
 
-    constructor() {
-      this.zielY = random(270, 400);
-      this.zuruecksetzen();}
+    constructor() { // Methode legt Ziel des Regentropfens fest, automatisch ausgeführt wenn man mit new Regentropfen() einen neuen Regentropfen erstellt
+      this.zielY = random(270, 400); // speichert die senkrechte zufällige Zielposition (zwischen 270px-400px) in der Eigenschaft .zielY
+      this.zuruecksetzen();} // nächste Methode wird aufgerufen
 
-    zuruecksetzen() {
-      this.x = random(0, 750);
-      this.y = random(50, 100);
-      this.kreis = 0;}
+    zuruecksetzen() { // Methode legt neue Startposition fest
+      this.x = random(0, 750); // zufällige x-Position zwischen 0 und 750px
+      this.y = random(0, 100); // zufällige y-Position zwischen 0 und 100px
+      this.kreis = 0;} // setzt die Größe des Kreises auf 0
 
-    bewegen() {
-      if (this.y < this.zielY) {
-        this.y += 10;}
+    bewegen() { // Methode bewegt den Tropfen und lässt Kreis entstehen
+      if (this.y < this.zielY) { // Wenn y-Position kleiner als Zielposition...
+        this.y = this.y + 10;} // ...dann wird die y-Position um 10px erhöht -> Tropfen fällt (immer 10px weiter nach unten)
+      else { 
+        this.kreis = this.kreis + 0.5; // Sonst (Zielpostion erreicht/überschritten) wird die Variable this.kreis (Radius) bei jedem Aufruf um 0.5 erhöht
+
+      if (this.kreis > 40) { // Wenn der Kreis größer als 40px ist...
+        this.zuruecksetzen();}}} // ...dann wird zuruecksetzen aufgerufen (-> neuer Regentropfen)
+
+    anzeigen() { // Methode zeichnet Tropfen oder Kreis
+      push(); // speichert die aktuellen Zeicheneinstellungen
+
+      if (this.y < this.zielY) { // Wenn y-Position kleiner als Zielposition des Tropfens
+        stroke(200, 230, 255); // Farbe (R,G,B): sehr helles blau 
+        line(this.x, this.y - 10, this.x, this.y);} // zeichnet die Linie eines Tropfens (Anfang: x-Position, y-Position - 10, Ende: x-Position, y-Position)
       else {
-        this.kreis += 0.5;}
+        noFill(); // Sonst: keine Füllfarbe
+        stroke(255, 255, 255, 255 - this.kreis * 6); // Farbe (R,G,B)= weiß, Deckkraft 255 (voll sichtbar) - Kreisgröße * 6 (Kreisgröße 40 = Deckkraft 15 (fast unsichtbar))
+        ellipse(this.x, this.zielY, this.kreis, this.kreis / 3);} // zeichnet eine Ellipse (x-Position, y-Zielposition, Höhe der Ellipse: Kreisgröße/3 -> flach)
 
-      if (this.kreis > 40) {
-        this.zuruecksetzen();}
-    }
-
-    anzeigen() {
-      push();
-
-      if (this.y < this.zielY) {
-        stroke(200, 230, 255);
-        line(this.x, this.y - 10, this.x, this.y);}
-      else {
-        noFill();
-        stroke(255, 255, 255, 255 - this.kreis * 6);
-        ellipse(this.x, this.zielY, this.kreis, this.kreis / 3);}
-
-      pop();}
+      pop();} // Stellt die ursprünglichen Zeicheneinstellungen wieder her () (von push()) -> damit es nur für den aktuellen Tropfen gilt
   }
 
   function setup() {
