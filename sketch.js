@@ -248,7 +248,7 @@
     if (modus === "demo") { // Wenn modus auf demo steht 
       let phase = (demoZeit / 35 + nummer * 0.85) % 6; // dann wird Variable phase erstellt: demoZeit (Zähler) / 35 (Verlangsamt Anstieg des Wertes) + nummer * 0.85 (für zeitliche Verschiebung), % 6 berechnet den Rest einer Division durch 6 und sorgt für eine regelmäßige Wiederholung
       if (phase < 2.5) { // Wenn Variable phase kleiner als 2.5
-      	return 190;} // dann wird künstlicher Energiewert 190 zurückgegeben
+      	return 190;}} // dann wird künstlicher Energiewert 190 zurückgegeben
 	  else {
     	return 0;} // Sonst (wenn weder Audio-Modus (mit vorhandenem FFT-Objekt) noch Demo-Modus aktiv ist -> Energiewert 0 wird zurückgegeben
   }
