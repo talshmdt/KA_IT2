@@ -132,7 +132,7 @@
       else {
         noFill(); // Sonst: keine Füllfarbe
         stroke(255, 255, 255, 255 - this.kreis * 6); // Farbe (R,G,B)= weiß, Deckkraft 255 (voll sichtbar) - Kreisgröße * 6 (Kreisgröße 40 = Deckkraft 15 (fast unsichtbar) -> je größer der Kreis wird desto transparenter wird er)
-        ellipse(this.x, this.zielY, this.kreis, this.kreis / 3);} // zeichnet eine Ellipse (x-Position, y-Zielposition, Höhe der Ellipse: Kreisgröße/3 -> flach)
+        ellipse(this.x, this.zielY, this.kreis, this.kreis / 3);} // zeichnet eine Ellipse (x-Position, y-Zielposition, Kreisgröße frü Breite, Höhe der Ellipse: Kreisgröße/3 -> flach)
 
       pop();} // Stellt die ursprünglichen Zeicheneinstellungen wieder her () (von push()) -> damit es nur für den aktuellen Tropfen gilt
   }
@@ -246,68 +246,68 @@
       return fft.getEnergy(baum.tief, baum.hoch);} // ermittelt getEnergy Intensität des Frequenzbereichs, .tief = Frequenzuntergrneze, .hoch = Frequenzobergrenze (return gibt Wert zurück und beendet Funktion)
 
     if (modus === "demo") { // Wenn modus auf demo steht 
-      let phase = (demoZeit / 55 + nummer * 0.85) % 6; // dann wird Variable phase erstellt: demoZeit (Zähler) / 55 (Verlangsamt Anstieg des Wertes) + nummer * 0.85 (für zeitliche Verschiebung), % 6 berechnet den Rest einer Division durch 6 und sorgt für eine regelmäßige Wiederholung
-      if (phase < 1.5) { // 
-      	return 190;} 
+      let phase = (demoZeit / 35 + nummer * 0.85) % 6; // dann wird Variable phase erstellt: demoZeit (Zähler) / 35 (Verlangsamt Anstieg des Wertes) + nummer * 0.85 (für zeitliche Verschiebung), % 6 berechnet den Rest einer Division durch 6 und sorgt für eine regelmäßige Wiederholung
+      if (phase < 2.5) { // Wenn Variable phase kleiner als 2.5
+      	return 190;} // dann wird künstlicher Energiewert 190 zurückgegeben
 	  else {
-    	return 0;}
+    	return 0;} // Sonst (wenn weder Audio-Modus (mit vorhandenem FFT-Objekt) noch Demo-Modus aktiv ist -> Energiewert 0 wird zurückgegeben
   }
 
-  function zeichneBaeume(hinten) {
-    for (let i = 0; i < baeume.length; i++) {
-      if (baeume[i].hinten === hinten) {
-        baeume[i].bewegen(i);
-        baeume[i].anzeigen();}}
+  function zeichneBaeume(hinten) { // Funktion zeichneBaume (Unterscheidung in Bäume hinten und vorne) -> Funktion erwartet Bäume hinten (true)
+    for (let i = 0; i < baeume.length; i = i + 1) { // For-Schleife: Index beginnt bei 0, Schleife läuft bis .length (6 Bäume) erreicht ist, Zähler wird nach jedem Durchlauf um 1 erhöht
+      if (baeume[i].hinten === hinten) { // Wenn das jeweilige Baumobjekts mit dem übergebenen Parameter hinten übereinstimmt
+        baeume[i].bewegen(i); // dann wird die Methode bewegen für das Baumobjekt aufgerufen
+        baeume[i].anzeigen();}} // dann wird die Methode anzeigen für das Baumobjekt aufgerufen
   }
 
-  function zeichneHintergrundBaeume() {
-    for (let i = 0; i < hintergrundRegler.value(); i++) {
-      hintergrundBaeume[i].bewegen(i + baeume.length);
-      hintergrundBaeume[i].anzeigen();}
+  function zeichneHintergrundBaeume() { // Funktion zeichneHintergrundBaeume
+    for (let i = 0; i < hintergrundRegler.value(); i = i + 1) { // For-Schleife: Index beginnt bei 0, Schleife läuft bis hintergrundRegler.value() (Wert des Reglers, bis zu 8 Bäume) erreicht ist, Zähler wird nach jedem Durchlauf um 1 erhöht
+      hintergrundBaeume[i].bewegen(i + baeume.length); // dann wird die Methode bewegen für das Baumobjekt (im Hintergrund) aufgerufen (durch + baeume.length wird die Nummerierung für den Demo-Modus fortgesetzt)
+      hintergrundBaeume[i].anzeigen();} // dann wird die Methode anzeigen für das Baumobjekt (im Hintergrund) aufgerufen
   }
 
-  function draw() {
-    background(135, 206, 235);
+  function draw() { // Funktion wird ständig wiederholt (ca. 60 Durchläufe pro Sekunde)
+    background(135, 206, 235); // Farbe der Zeichenfläche (Himmelblau)
 
-    let lautstaerke = 0;
+    let lautstaerke = 0; // erstellt Variable lautstaerke und setzt sie auf 0
 
-    if (modus === "audio" && audio && audio.enabled) {
-      lautstaerke = audio.getLevel();
-      fft.analyze();}
+    if (modus === "audio" && audio && audio.enabled) { // Wenn der modus audio ist, Audioobjekt vorhanden ist und der Audioeingang aktiviert ist
+      lautstaerke = audio.getLevel(); // dann wird der aktuellen Lautstärkepegel des Audioeingangs ermtteln und in der Variable lautstaerke gespeichert
+      fft.analyze();} // dann wird die Methode .analyze ausgeführt (Frequenzanalyse des aktuellen Audiosignals)
 
-    if (modus === "demo") {
-      demoZeit++;
-      lautstaerke = (sin(demoZeit * 0.06) + 1) * 0.07;}
+    if (modus === "demo") { // Wenn der modus demo ist 
+      demoZeit = demoZeit + 1; // dann wird die Variable demozeit bei jedem Durchlauf um 1 erhöht
+      lautstaerke = (sin(demoZeit * 0.06) + 1) * 0.07;} // dann wird ein künstlicher, sich regelmäßig verändernder Lautstärkewert erzeugt (sin: regelmäßige Schwingung -1 +1, demoZeit: fortlaufender Zähler, 0.06 bestimmt die Geschwindigkeit der Lautstärkeveränderung, +1 verschiebt den Wertebereich auf 0 bis 2 (verhindert negative Werte), * 0.07 verkleinert den Wertebereich auf 0 bis 0,14)
 
-    let empfindlichkeit = map(wolkenSchwelle.value(), 1, 100, 0.3, 0.03);
-    let wetterStaerke = constrain(lautstaerke / empfindlichkeit, 0, 1);
+    let empfindlichkeit = map(wolkenSchwelle.value(), 1, 100, 0.3, 0.03); // Funktion map() überträgt einen Wert aus einem Wertebereich in einen anderen Wertebereich, hier: aktuelle Reglerwert zwischen 1 und 100 wird hier in einen Wert zwischen 0,3 und 0,03 -> je höher der Reglerwert, deto kleiner der neu berechnete Wert empfindlichkeit -> Ergebnis wird in neu erstelletr Variable empfindlichkeit gespeichert 
+    let wetterStaerke = constrain(lautstaerke / empfindlichkeit, 0, 1); // Lautstärke durch EMpfindlichkeit teilen, constrain() begrenzt Ergebnis auf einen Wertebereich zwischen 0 und 1 -> Ergenbis wird in neu erstellter Variable wetterStaerke gesperichert (je kleiner der Wert der Variable empfindlichkeit ist, desto größer wird bei gleicher Lautstärke die berechnete Wetterstärke)
 
-    image(sonnenBild, 50, 30, 120, 120);
+    image(sonnenBild, 50, 30, 120, 120); // zeichnet das zuvor geladene Bild der Sonne (x-Position, y-Position, Breite, Höhe)
 
-    let helligkeit = map(wetterStaerke, 0, 1, 255, 60);
-    tint(helligkeit);
+    let helligkeit = map(wetterStaerke, 0, 1, 255, 60); // Wetterstärke zwischen 0 und 1 wird in einen Helligkeitswert zwischen 255 und 60 umgerechnet (map) -> speichert Ergebnis in neu erstellter Variable helligkeit
+    tint(helligkeit); // Funktion tint verändert farbliche Darstellung der nächsten Bilder (Wolken)
 
-    for (let i = 0; i < wolkenRegler.value(); i++) {
-      wolken[i].bewegen();
-      wolken[i].anzeigen();}
+    for (let i = 0; i < wolkenRegler.value(); i = i + 1) { // For-Schleife: Index startet bei 0, Schleie läuft solange i kleiner als wolkenRegler.value ist (100), je Druchlauf um 1 erhöht
+      wolken[i].bewegen(); // dann wird Methode bewegen ausgeführt für die jeweilige Wolke
+      wolken[i].anzeigen();} // dann wird Methode anzeigen ausgeführt für die jeweilige Wolke
 
-    noTint();
+    noTint(); // deaktiviert die vorherige Absunkelung durch tint
 
-    image(bergeBild, 0, 0, 750, 500);
-    image(huegelBild, 0, 0, 750, 500);
+    image(bergeBild, 0, 0, 750, 500); // zeichnet das zuvor geladene Bild der Berge (x-Position, y-Position, Breite, Höhe)
+    image(huegelBild, 0, 0, 750, 500); // zeichnet das zuvor geladene Bild der Hügel (x-Position, y-Position, Breite, Höhe)
 
-    zeichneHintergrundBaeume();
+    zeichneHintergrundBaeume(); // ruft Funktion zum bewegen und anzeigen der einzelnen Hintergrundbäume auf (Regler)
 
-    image(wasserBild, 0, 0, 750, 500);
-    zeichneBaeume(true);
+    image(wasserBild, 0, 0, 750, 500); // zeichnet das zuvor geladene Bild des Wassers (x-Position, y-Position, Breite, Höhe)
+    zeichneBaeume(true); // ruft Funktion zum Bewegen und Anzeigen der hinteren Baumobjekte aus dem Array baeume auf
 
-    let regenAnzahl = floor(wetterStaerke * regentropfen.length);
+    let regenAnzahl = floor(wetterStaerke * regentropfen.length); // Wetterstärke wird mit der Anzahl der vorhandenen Regentropfenobjekte (30) multipliziert, floor() rundet das Ergebnis auf die nächstkleinere ganze Zahl ab (bei höherer Wetterstärke eine größere Anzahl an Regentropfen) -> Ergbenis wird in neu erstellter Variable regenAnzahl gespeichert
 
-    for (let i = 0; i < regenAnzahl; i++) {
-      regentropfen[i].bewegen();
-      regentropfen[i].anzeigen();}
+    for (let i = 0; i < regenAnzahl; i = i + 1) { // For-Schleife: Index startet bei 0, Schleife läuft solange i kleienr als regenAnzahl ist (aktueller Wert, bis zu 30), je Durchlauf um 1 erhöht
+      regentropfen[i].bewegen(); // dann wird die Methode bewegen aufgerufen
+      regentropfen[i].anzeigen();} // dann wird die Methode anzeigen aufgerufen
 
-    image(wiesenBild, 0, 0, 750, 500);
-    image(vordergrundBild, 0, 0, 750, 500);
-    zeichneBaeume(false);
+    image(wiesenBild, 0, 0, 750, 500); // // zeichnet das zuvor geladene Bild der Wiese (x-Position, y-Position, Breite, Höhe)
+    image(vordergrundBild, 0, 0, 750, 500); // zeichnet das zuvor geladene Bild im Vordergrund (x-Position, y-Position, Breite, Höhe)
+    zeichneBaeume(false); // zeichnet Baumobjekte aus dem Array baeume, deren Eigenschaft hinten auf false gesetzt ist (Bäume in Vordergrund)
   }
