@@ -159,96 +159,98 @@
     reglerZeile.class("reglerreihe"); // die Variable reglerZeile wird der CSS-Klasse reglerreihe zugewiesen
     reglerZeile.parent("steuerung"); // legt die Stelle fest, wo der Inhalt der Variable reglerZeile eingefügt wird (HTML-Code: ID steuerung)
 
-    wolkenRegler = erstelleRegler(reglerZeile, "Anzahl der Wolken", 0, 100, 50); // ruft Funktion erstelleRegler auf: div-Container reglerZeile in dem der Regler erstellt wird, Text, Minimalwert 0, Maximalwert 100, Startwert 50 -> Rückgabe der Funktion in Variable wolkenRegler gespeichert
-    wolkenSchwelle = erstelleRegler(reglerZeile, "Wolken- und Regenempfindlichkeit", 1, 100, 50); // ruft Funktion erstelleRegler auf: div-Container reglerZeile in dem der Regler erstellt wird, Text, Minimalwert 1, Maximalwert 100, Startwert 50 -> Rückgabe der Funktion in Variable wolkenSchwelle gespeichert
-    baumSchwelle = erstelleRegler(reglerZeile, "Baum-Schwellenwert", 0, 255, 100); // ruft Funktion erstelleRegler auf: div-Container reglerZeile in dem der Regler erstellt wird, Text, Minimalwert 0, Maximalwert 255 (maximaler Energiewert bei fft), Startwert 100 -> Rückgabe der Funktion in Variable baumSchwelle gespeichert
-    hintergrundRegler = erstelleRegler(reglerZeile, "Anzahl der Bäume", 0, 8, 4); // ruft Funktion erstelleRegler auf: div-Container reglerZeile in dem der Regler erstellt wird, Text, Minimalwert 0, Maximalwert 8, Startwert 4 -> Rückgabe der Funktion in Variable hintergrundRegler gespeichert
+    wolkenRegler = erstelleRegler(reglerZeile, "Anzahl der Wolken: ", 0, 100, 50); // ruft Funktion erstelleRegler auf: div-Container reglerZeile in dem der Regler erstellt wird, Text, Minimalwert 0, Maximalwert 100, Startwert 50 -> Rückgabe der Funktion in Variable wolkenRegler gespeichert
+    wolkenSchwelle = erstelleRegler(reglerZeile, "Wolken- und Regenempfindlichkeit: ", 1, 100, 50); // ruft Funktion erstelleRegler auf: div-Container reglerZeile in dem der Regler erstellt wird, Text, Minimalwert 1, Maximalwert 100, Startwert 50 -> Rückgabe der Funktion in Variable wolkenSchwelle gespeichert
+    baumSchwelle = erstelleRegler(reglerZeile, "Baum-Schwellenwert: ", 0, 255, 100); // ruft Funktion erstelleRegler auf: div-Container reglerZeile in dem der Regler erstellt wird, Text, Minimalwert 0, Maximalwert 255 (maximaler Energiewert bei fft), Startwert 100 -> Rückgabe der Funktion in Variable baumSchwelle gespeichert
+    hintergrundRegler = erstelleRegler(reglerZeile, "Anzahl der Bäume: ", 0, 8, 4); // ruft Funktion erstelleRegler auf: div-Container reglerZeile in dem der Regler erstellt wird, Text, Minimalwert 0, Maximalwert 8, Startwert 4 -> Rückgabe der Funktion in Variable hintergrundRegler gespeichert
 
     statusText = createP("Status: Audio aus"); // erstellt HTML-Absatzelement (<p>), Text -> gespeichert in Variable statusText
     statusText.id("status"); // gibt dem HTML-Absatzelement (<p>) die HTML-ID status (in CSS .status)
     statusText.parent("steuerung"); // legt die Stelle fest, wo der Inhalt der Variable reglerZeile eingefügt wird (HTML-Code: ID steuerung) --> Bereich steuerung enthält Buttons, Regler und Statusanzeige
   }
 
-  function erstelleKnopf(eltern, name, funktion) {
-    let knopf = createButton(name);
-    knopf.parent(eltern);
-    knopf.mousePressed(funktion);}
+  function erstelleKnopf(eltern, name, funktion) { // Funktion erstelleKnopf mit 3 Parametern: HTML-Container, Beschridtung Button, Funktion beim Drücken des Buttons
+    let knopf = createButton(name); // erstellt Button, speichert ihn in der Variable knopf 
+    knopf.parent(eltern); // legt fest in welchem HTML-Container der Button erscheinen soll
+    knopf.mousePressed(funktion);} // sobald der Button mit der Maus angeklickt wird, wird die Funktion ausgeführt
 
-  function erstelleRegler(eltern, name, min, max, wert) {
-    let gruppe = createDiv();
-    gruppe.class("reglergruppe");
-    gruppe.parent(eltern);
+  function erstelleRegler(eltern, name, min, max, wert) { // Funktion erstelleRegler mit 4 Parametern: HTML-Container, Beschriftung Regler, Minimalwert, Maximalwert, Startwert
+    let gruppe = createDiv(); // erstellt neues HTML-Element vom Typ <div> (Container), speichert es in der neuen Variable gruppe (jeder Regler bekommt eigene Gruppe)
+    gruppe.class("reglergruppe"); // neu erstellten Container gruppe wird der CSS-Klasse reglergruppe zugewiesen (alle Regler gleiche Klasse)
+    gruppe.parent(eltern); // Parameter eltern wird an den übergeordneten HTML-Container reglerZeile übergeben
 
-    let beschriftung = createSpan(name + ": " + wert);
-    beschriftung.parent(gruppe);
+    let beschriftung = createSpan(name + wert); // erstellt Variable beschriftung, ertsellt HTML-Element (<span>) (wie <dic>-Container, aber innerhalb einer Zeile, für kurze Texte geeignet), übergebener Name des Reglers, übergebener Wert
+    beschriftung.parent(gruppe); // Beschriftung wird in den HTML-Container gruppe hinzugefügt (dem einzelnen Regler)
 
-    let regler = createSlider(min, max, wert, 1);
-    regler.parent(gruppe);
+    let regler = createSlider(min, max, wert, 1); // erstellt Schieberegler mit 4 Parametern: Minimalwert, Maximalwert, Startwert, Schritte des Reglers + speichert diesen in der Variable regler
+    regler.parent(gruppe); // fügt den Schieberegler in den zuvor erstellten HTML-Container gruppe ein (dem einzelnen Regler)
 
-    regler.input(() => beschriftung.html(name + ": " + regler.value()));
+    regler.input(function() { //  Funktion wird ausgeführt wenn sich der Reglerwert verändert (regler.input()), ändert den Inhalt der Beschriftung (Funktion ohne eigenen Namen)
+    beschriftung.html(name + regler.value());}); // .html() verändert den Inhalt des zuvor erstellten HTML-Elements beschriftung (Name + neu engestellter Wert des Regler (durch .value))
 
-    return regler;
+    return regler; // return gibt den erstellten Schieberegler als Ergebnis der Funktion zurück (z.B. an Variable wolkenRegler)
   }
 
-  async function starteAudio() {
-    stoppeAlles();
-    statusText.html("Status: Audio wird gestartet...");
+  async function starteAudio() { // Funtion starteAudio (async, damit await verwendet werden kann)
+    stoppeAlles(); // ruft Funktion stoppeAlles() auf
+    statusText.html("Status: Audio wird gestartet..."); // ändert den Inhalt des HTML-Elements statusText (zuvor erstelltes <p>-Element) zu dem neuen Text
 
-    let neuesAudio = new p5.AudioIn();
-    audio = neuesAudio;
+    let neuesAudio = new p5.AudioIn(); // new erstellt neues Objekt p5.AudioIn(), ermöglicht Zugriff auf Audioeingang (Objekt), wird in neu erstellter Variable neuesAudio gespeichert
+    audio = neuesAudio; // Audioeingangsobjekt (neuesAudio) zusätzlich der Variable audio zugewiesen
 
-    try {
-      await userStartAudio();
+    try { // leitet Codeblock ein, in dem Fehler abgefangen werden (Fehler -> catch-Block ausgeführt)
+      await userStartAudio(); // Audio-Kontext des Browsers wird aktiviert (userStartAudio), await wartet bis dieser Vorgang abgeschlossen ist
 
-      if (audio !== neuesAudio) return;
+      if (audio !== neuesAudio) {return;} // Wenn Variable audio ungleich mit Variable neuesAudio ist -> Fuktion frühzeitig beenden (für den Fall, dass Benutzer während des Startvorgangs schon auf Stoppen oder Demo-Modus geklickt haben)
 
-      neuesAudio.start(() => {
-        if (audio !== neuesAudio) {
-          neuesAudio.stop();
-          return;}
+      neuesAudio.start(() => { // .start startet den Audioeingang (fordert gegebenenfalls Zugriffsberechtigung) -> Callback-Funktion wenn Audio gestartet wurde
+        if (audio !== neuesAudio) { // Wenn Variable audio ungleich mit Variable neuesAudio ist 
+          neuesAudio.stop(); // Audioeingang wird gestoppt
+          return;} // Callback-Funktion beendet
 
-        fft = new p5.FFT(0.8, 1024);
-        fft.setInput(audio);
+        fft = new p5.FFT(0.8, 1024); // erstellt Objekt p5.FFT (für Frequenzanalyse): 0,8 -> Glättungsfaktor, 1024 -> Anzahl der Frequenzbereiche, speichert es in Variable fft
+        fft.setInput(audio); // Methode .setInput() legt fest, welches Audiosignal (audio) analysiert wird 
 
-        modus = "audio";
-        statusText.html("Status: Audio aktiv – Synthesizer spielen");}, audioFehler);}
-    catch (fehler) {audioFehler(fehler);}
+        modus = "audio"; // der Variable modus wird der Text audio zugewiesen
+        statusText.html("Status: Audio aktiv – Synthesizer spielen");}, audioFehler);} // Aktualisiert HTML-Element mit Statusanzeige
+    catch (fehler) {audioFehler(fehler);} // catch fängt aufgetretenen Fehler ab, stellt ihn unter dem Namen fehler zur Verfügung, Funktion audioFehler() wird aufgerufen
 
-    function audioFehler(fehler) {
-      if (audio !== neuesAudio) return;
+    function audioFehler(fehler) { // Funktion audioFehler, über Parameter fehler werden Fehlerinformationen übergeben
+      if (audio !== neuesAudio) return; // Wenn Variable audio ungleich mit Variable neuesAudio ist -> Funktion wird beendet (verhindert, dass ein verspäteter Fehler eines alten Startvorgangs einen neu gestarteten Modus unterbricht)
 
-      stoppeAlles();
-      statusText.html("Fehler: Audioeingang nicht verfügbar.");
-      console.error(fehler);}
+      stoppeAlles(); // führt Funktion stoppe alles aus
+      statusText.html("Fehler: Audioeingang nicht verfügbar."); // // Aktualisiert HTML-Element mit Statusanzeige
+      console.error(fehler);} // gibt technische Fehlerinformationen an die Entwicklerkonsole des Browsers aus
   }
 
-  function stoppeAlles() {
-    if (audio) audio.stop();
+  function stoppeAlles() { // Funktion stoppeAlles beendet Audio- und Demo-Modus
+    if (audio) audio.stop(); // Wenn in Variable audio ein Audioeingangsobjekt vorhanden ist, Audioeingang wird gestoppt
 
-    audio = undefined;
-    fft = undefined;
-    modus = "aus";
+    audio = undefined; // Variable audio verweist nicht mehr auf Variable neuesAudio (zurückgesetzt)
+    fft = undefined; // fft wird auch zurückgesetzt 
+    modus = "aus"; // modus wird neuer Text zugewiesen
 
-    statusText.html("Status: Audio und Demo gestoppt");
+    statusText.html("Status: Audio und Demo gestoppt"); // ändert Textinhalt des HTML-Elements für die Statusanzeige
   }
 
-  function starteDemo() {
-    stoppeAlles();
-    demoZeit = 0;
-    modus = "demo";
+  function starteDemo() { // Funktion starteDemo
+    stoppeAlles(); // führt Funktion stoppeAlles aus
+    demoZeit = 0; // Variable demoZeit (Zähler) wird auf 0 gesetzt
+    modus = "demo"; // modus wird neuer Text zugewiesen
 
-    statusText.html("Status: Demo-Modus aktiv (ohne Audiosignal)");
+    statusText.html("Status: Demo-Modus aktiv (ohne Audiosignal)"); // ändert Textinhalt des HTML-Elements für die Statusanzeige
   }
 
-  function baumEnergie(baum, nummer) {
-    if (modus === "audio" && fft) {
-      return fft.getEnergy(baum.tief, baum.hoch);}
+  function baumEnergie(baum, nummer) { // Funktion baumEnergie, 2 Paramter: baum, Nummer/Index des Baumes
+    if (modus === "audio" && fft) { // Wenn modus auf audio steht und FFT-Objekt vorhanden sind
+      return fft.getEnergy(baum.tief, baum.hoch);} // ermittelt getEnergy Intensität des Frequenzbereichs, .tief = Frequenzuntergrneze, .hoch = Frequenzobergrenze (return gibt Wert zurück und beendet Funktion)
 
-    if (modus === "demo") {
-      let phase = (demoZeit / 55 + nummer * 0.85) % 6;
-      return phase < 1.5 ? 190 : 0;}
-
-    return 0;
+    if (modus === "demo") { // Wenn modus auf demo steht 
+      let phase = (demoZeit / 55 + nummer * 0.85) % 6; // dann wird Variable phase erstellt: demoZeit (Zähler) / 55 (Verlangsamt Anstieg des Wertes) + nummer * 0.85 (für zeitliche Verschiebung), % 6 berechnet den Rest einer Division durch 6 und sorgt für eine regelmäßige Wiederholung
+      if (phase < 1.5) { // 
+      	return 190;} 
+	  else {
+    	return 0;}
   }
 
   function zeichneBaeume(hinten) {
